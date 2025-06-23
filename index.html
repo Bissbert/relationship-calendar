@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relationship Calendar 💘</title>
+  <script src="js/ics.min.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-[#efeff2] text-black font-sans min-h-screen flex flex-col items-center p-4">
+  <div class="w-full max-w-3xl bg-white rounded-2xl shadow-md p-6">
+    <h1 class="text-3xl font-bold text-center mb-4 text-[#a69eb0]">💘 Relationship Calendar</h1>
+
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Add a New Memory</h2>
+      <form id="event-form" class="space-y-4">
+        <div>
+          <label for="start-date" class="block font-semibold">Start Date</label>
+          <input type="date" id="start-date" class="w-full border border-gray-300 p-2 rounded-xl" / required>
+        </div>
+        <div>
+          <label for="custom-event" class="block font-semibold">Event Title</label>
+          <input type="text" id="custom-event" placeholder="Special Moment 💖" class="w-full border border-gray-300 p-2 rounded-xl" />
+        </div>
+        <div>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="is-serial" class="form-checkbox h-4 w-4 text-[#a69eb0]" />
+            <span class="font-semibold">Make this a recurring (serial) event</span>
+          </label>
+        </div>
+        <div id="pattern-section" class="hidden space-y-4">
+          <div>
+            <label for="pattern-type" class="block font-semibold">Recurrence Pattern</label>
+            <select id="pattern-type" class="w-full border border-gray-300 p-2 rounded-xl">
+              <option value="linear">Linear</option>
+              <option value="exponential">Exponential</option>
+            </select>
+          </div>
+          <div id="linear-options" class="space-y-2">
+            <label for="linear-interval" class="block font-semibold">Linear Interval</label>
+            <select id="linear-interval" class="w-full border border-gray-300 p-2 rounded-xl">
+              <option value="7">Weekly</option>
+              <option value="30">Monthly</option>
+              <option value="365">Yearly</option>
+            </select>
+            <div>
+              <label for="recurring-end" class="block font-semibold">Repeat Until</label>
+              <input type="date" id="recurring-end" class="w-full border border-gray-300 p-2 rounded-xl" />
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="bg-[#a69eb0] hover:bg-[#dadae3] text-gray-500 font-semibold py-2 px-4 rounded-xl w-full">
+          ➕ Add Event
+        </button>
+      </form>
+    </section>
+
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Your Memory List</h2>
+      <p class="text-sm text-gray-500 mb-2">Below is your current calendar. Click ✕ to remove any event.</p>
+      <div id="event-preview" class="space-y-2"></div>
+    </section>
+
+    <section class="flex flex-col gap-2">
+      <button id="clear-btn" class="mb-2 bg-red-100 hover:bg-red-200 text-red-600 font-semibold py-2 px-4 rounded-xl w-full">🗑️ Clear All Events</button>
+      </div>
+<button id="download-btn" class="bg-[#f2e2cd] hover:bg-[#dadae3] text-black font-semibold py-2 px-4 rounded-xl w-full">
+        📥 Download .ics Calendar
+      </button>
+    </section>
+  </div>
+
+<script src="js/Blob.js"></script>
+<script src="js/FileSaver.min.js"></script>
+
+</body>
+</html>
