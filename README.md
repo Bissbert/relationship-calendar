@@ -112,6 +112,9 @@ docs/            subsystem write-ups and measurement provenance
   dates.
 - The JavaScript contains toast calls, but the HTML has no toast elements, so
   those feedback messages are not displayed.
+- `index.html:67` contains an unmatched closing `</div>` between the action
+  buttons. The browser recovers during parsing, but the source markup is
+  malformed.
 - `localStorage` is browser- and origin-specific. Clearing site data or using
   another browser removes the visible working list from that browser.
 - The page loads Tailwind CSS from jsDelivr, so the initial styling depends on
