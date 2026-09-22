@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pattern === 'linear') {
       entry.interval = document.getElementById('linear-interval').value;
-      entry.until = document.getElementById('linear-end').value;
+      entry.until = document.getElementById('recurring-end').value;
     }
 
     events.push(entry);
