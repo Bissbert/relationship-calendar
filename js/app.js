@@ -37,8 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stored) {
       events = JSON.parse(stored);
       updatePreview();
-    showToast('Event added successfully!');
-    showToast("💖 Event added!");
     }
   };
 
@@ -67,8 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         events.splice(index, 1);
         saveToLocalStorage();
         updatePreview();
-    showToast('Event added successfully!');
-    showToast("💖 Event added!");
+        showToast('Event removed successfully!');
       });
     });
   };
@@ -171,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     events.push(entry);
     saveToLocalStorage();
     updatePreview();
-    showToast('Event added successfully!');
     showToast("💖 Event added!");
     form.reset();
     patternSection.classList.add('hidden');
@@ -183,8 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
       events = [];
       localStorage.removeItem('relationshipEvents');
       updatePreview();
-    showToast('Event added successfully!');
-    showToast("💖 Event added!");
+      showToast('Events cleared successfully!');
     }
   });
 
