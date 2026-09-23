@@ -18,13 +18,14 @@ The screenshots use the fictional couple Robin & Kai.
 
 | Feature | Details |
 |---|---|
+| First-run setup | A new calendar starts with three short steps: your names, the day you got together, and the dates you already know (anniversary, birthdays, first date, Valentine's Day …). Skippable, and skipped automatically when you arrive from a share link. |
 | Upcoming dates | The next date as a large ticket, then every upcoming date grouped by month with "in 12 days" style countdowns. Past dates fold away behind a toggle. |
 | Month view | A keyboard-navigable month grid (arrow keys, Home/End, Page Up/Down, Shift+Page for years). Selecting a day lists its dates and offers to add one there. |
 | Together counter | Enter the day you got together and the header shows "Day N". |
 | Milestones | Generates monthiversaries, day counts (100, 500, 1000 …), numbered anniversaries and optional fun numbers (1111, 1234 …) from your start date, with a preview before adding. |
 | Quick picks | One tap fills in dates most couples keep: your anniversary (from your start date), each partner's birthday, your first date, a weekly Friday date night at 19:00, Valentine's Day and the day you moved in. Each comes with its usual repeat and reminder. A pick disappears once a date with that name exists. |
 | Rich dates | Kind (anniversary, birthday, date night, trip, milestone, other), optional time and duration, place, notes, repeats (weekly, monthly, yearly, with an optional end) and a reminder. |
-| Edit and undo | Every date can be edited. Adding, editing, deleting and clearing all show a toast with **Undo**. |
+| Edit, delete and undo | Every ticket has labelled Edit and Delete buttons, and the edit form has "Delete this date". "Start over" removes all dates after an in-place confirmation that names the count. Every change shows a toast with **Undo** that waits while you point at it. |
 | Calendar export | A standards-compliant `.ics` file: all-day or timed events, `RRULE` repeats, `VALARM` reminders and stable UIDs, so importing again updates dates instead of duplicating them. |
 | Google Calendar | Each date has a link that opens it prefilled in Google Calendar. |
 | Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; opening the link offers to merge the dates. |

@@ -8,6 +8,7 @@ import { milestones } from '../js/milestones.js';
 import { toICS, fromICS, fold, escapeText, reminderTrigger, parseDuration } from '../js/ics.js';
 import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup } from '../js/share.js';
 import { presets, availablePresets } from '../js/presets.js';
+import { shouldWelcome, welcomeChoices, welcomeEvents } from '../js/welcome.js';
 
 const ev = (fields) => normalizeEvent({ title: 'Test', date: '2026-01-31', ...fields });
 
@@ -208,4 +209,25 @@ test('quick picks hide once a date with that name exists', () => {
   assert.ok(!keys.includes('anniversary'));
   assert.ok(!keys.includes('date-night'));
   assert.ok(keys.includes('valentines'));
+});
+
+test('first-run setup shows only for an empty calendar outside share links', () => {
+  const empty = { events: [], settings: { names: ['', ''], since: '' } };
+  assert.ok(shouldWelcome(empty, '', false));
+  assert.ok(!shouldWelcome(empty, '', true));
+  assert.ok(!shouldWelcome(empty, '#share=abc', false));
+  assert.ok(!shouldWelcome({ ...empty, settings: { names: ['Robin', ''], since: '' } }, '', false));
+  assert.ok(!shouldWelcome({ ...empty, events: [ev({})] }, '', false));
+});
+
+test('first-run setup turns ticks and filled days into dates', () => {
+  const settings = { names: ['Robin', 'Jess'], since: '2019-06-01' };
+  const { ticks, fields } = welcomeChoices(settings, '2026-09-23');
+  assert.deepEqual(ticks.map((t) => [t.key, t.checked]), [['anniversary', true], ['date-night', false], ['valentines', true]]);
+  assert.deepEqual(fields.map((f) => f.key), ['birthday-0', 'birthday-1', 'first-date', 'moved-in']);
+  const events = welcomeEvents(settings, '2026-09-23', new Set(['anniversary']), { 'birthday-1': '1994-03-02', 'moved-in': 'nope' });
+  assert.deepEqual(events.map((e) => [e.title, e.date, e.repeat]), [
+    ['Our anniversary', '2019-06-01', 'yearly'],
+    ['Jess’ birthday', '1994-03-02', 'yearly'],
+  ]);
 });

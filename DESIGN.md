@@ -17,6 +17,9 @@ colors:
   ink: "#2a1d23"
   ink-soft: "#62505a"
   danger: "#a3262f"
+  danger-wash: "#f5dcdc"
+  danger-on-lining: "#f2b3b8"
+  danger-line: "#7c2b35"
   k-anniversary: "#9b2743"
   k-birthday: "#3b3a97"
   k-date: "#a33b66"
@@ -151,7 +154,7 @@ A deliberately narrow palette: one ink accent, one foil accent, one rare foil hi
 - **Paper Line** (`#d9c8b2`): borders and dividers on paper (ticket dashed stub divider, card-head rule, day-grid rules).
 - **Ink** (`#2a1d23`): primary text on paper.
 - **Ink Soft** (`#62505a`): secondary/muted text on paper (ticket meta, field hints, month weekday labels).
-- **Danger** (`#a3262f`): the one status color outside the two-ground system — field validation errors and the "Remove all dates" affordance.
+- **Danger** (`#a3262f`): the one status color outside the two-ground system — field validation errors, every Delete action on paper, and the solid "Yes, remove all" confirm. It has three helpers: **Danger Wash** (`#f5dcdc`, hover fill for red actions on paper), **Danger On-Lining** (`#f2b3b8`, red text that stays legible on velvet) and **Danger Line** (`#7c2b35`, the border of the Start over panel and its button on velvet).
 
 ### Category Marks
 Six additional colors identify a date's kind on the ticket meta line and inside the month grid: **Anniversary** (`#9b2743`), **Birthday** (`#3b3a97`, the same hue as Stamp Ink), **Date** (`#a33b66`), **Trip** (`#2b6650`), **Milestone** (`#86560f`) and **Other** (`#5b4852`). Per the source stylesheet's own comment, these are "always paired with an icon and label" — color is a reinforcement, never the sole signal (PRODUCT.md's WCAG 2.2 AA commitment).
@@ -212,7 +215,8 @@ The signature silhouette is the ticket: a CSS `mask` built from two radial-gradi
 - **Primary** (`.btn-primary`): Stamp Ink fill, white text — used inside paper contexts (form submits: "Add date," "Add milestones").
 - **Rose** (`.btn-rose`): Rose fill, ink text — the primary call-to-action wherever the surrounding ground is velvet ("Copy share link," "Download calendar file," banner's "Add them").
 - **Ghost / Quiet:** `.btn-ghost-light` is transparent with an on-lining-line border, for secondary actions on velvet; `.btn-quiet` is transparent with a paper-line border and ink text, for secondary actions on paper.
-- **Danger:** `.btn-danger` is transparent with a muted red border and red-tinted text, filling solid red only on hover — reserved for "Remove all dates."
+- **Danger:** three strengths, one per job. `.btn-danger` (velvet, outlined in Danger Line, Danger On-Lining text) opens the Start over confirm; `.btn-danger-paper` (paper, outlined, Danger text, Danger Wash on hover) is "Delete this date" in the edit form; `.btn-danger-solid` (Danger fill, white text) is only ever the final "Yes, remove all N". Every destructive button carries the trash icon and a verb; none is icon-only.
+- **Two-step removal:** removing one date is a single labelled click with a 12-second Undo toast. Removing everything first swaps "Remove all dates…" in place for a question that names the count ("Remove all 12 dates?"), a solid confirm and "Keep them" (focused, Escape also cancels). Nothing opens a modal.
 - **Hover / Focus:** background/color/border transition over 160ms (`var(--ease-out)`); `:active` presses down 1px (`translateY(1px)`); focus uses the shared `:focus-visible` outline (2px rose, 2px offset), except inside paper/card contexts where the outline color swaps to Stamp Ink.
 
 ### Chips (if used)
@@ -237,6 +241,15 @@ There is no persistent nav bar; in-page navigation is the segmented `.view-switc
 
 ### Ticket (signature component)
 A two-column grid — a narrow "stub" column (variable width via `--stub`) holding a rotated ink-stamp badge, and a body column with title, meta list and the right-aligned date/actions. The stamp badge is Barlow Condensed uppercase inside a double inset border (`box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 3px currentColor`), rotated -3deg, colored by the event's kind. A dashed divider marks the tear line between stub and body. Three sizes share one mask: compact (mobile), standard (list), and enlarged (the "Next up" hero ticket, `--stub: 7rem`, serif title instead of the default weight-650 sans title). New tickets play a single authored motion — the stamp "presses" in (`rotate/scale/blur`, 520ms) while the ticket wrapper settles down 6px — the one keyframe animation the system permits itself, and it is disabled entirely under `prefers-reduced-motion`.
+
+### Ticket action strip
+Every ticket, the Next up hero included, ends with a labelled strip under a dashed `paper-line` rule: pill buttons "Edit" and "Google Calendar" on the left, "Delete" in Danger pushed to the right (`margin-left: auto`) so it is never the neighbour of Edit. Buttons are 2.25rem tall, 2.75rem under `pointer: coarse`. Actions are always visible; nothing hides behind hover.
+
+### Toast
+The paper toast at the bottom carries the Undo for every change. It stays 12 seconds when it has an Undo (5 otherwise) and pauses while hovered or focused, resuming with at least 3 seconds left, so Undo never slips away mid-reach.
+
+### First-run setup
+A brand-new calendar (no dates, no names, no start date) that was not opened from a share link shows a three-step paper card in place of the empty board: names (filling the velvet heading live), the day you got together, then the dates you already know (checkbox rows for picks with a known day, optional date fields for birthdays, first date and moving in). Step titles are serif display, progress reads "Step 2 of 3" beside the buttons, and "Skip setup" is a plain underlined text button. Finishing adds everything in one undoable change; a `relationship-calendar:welcomed` flag keeps it from coming back.
 
 ## Do's and Don'ts
 
