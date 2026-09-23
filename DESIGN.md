@@ -218,6 +218,7 @@ The signature silhouette is the ticket: a CSS `mask` built from two radial-gradi
 ### Chips (if used)
 - **Style:** transparent background, `on-lining-soft` text, `lining-line` 1px border, fully round; the filter chips and the "kind" selection chips in the composer share the same pill shape.
 - **State:** `aria-pressed="true"` (filters, view-switch segments) or `:checked` (kind-option, an `<input>` hidden under a styled `<span>`) fills solid — on-lining/ink for filter chips, ink/paper (inverted) for kind options — rather than changing the border alone.
+- **Quick picks:** the same pill as a kind option, as a `<button>` with a dashed border that turns solid on hover. The dashed edge marks them as actions that fill the form, not a choice that stays selected, so they never take a checked state.
 
 ### Cards / Containers
 - **Corner Style:** 14px radius (`--radius`).

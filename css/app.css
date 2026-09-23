@@ -713,7 +713,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .kind-options { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .kind-option { position: relative; }
 .kind-option input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.kind-option span {
+.kind-option span,
+.quick-option span {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -730,6 +731,15 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .kind-option:hover span { border-color: #a8927a; color: var(--ink); }
 .kind-option input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .kind-option input:focus-visible + span { outline: 2px solid var(--stamp); outline-offset: 2px; }
+
+/* Quick picks are actions, not a choice, so they wear a dashed edge and sit
+   apart from the fields they fill in. */
+.quick-picks { gap: 0.5rem; padding-bottom: 1.1rem; border-bottom: 1px dashed var(--paper-line); }
+.quick-picks .field-hint:empty { display: none; }
+.quick-option { padding: 0; border: 0; background: none; font: inherit; cursor: pointer; border-radius: 999px; }
+.quick-option span { border-style: dashed; }
+.quick-option:hover span { border-style: solid; border-color: #a8927a; color: var(--ink); }
+.quick-option:focus-visible { outline: 2px solid var(--stamp); outline-offset: 2px; }
 
 .more summary {
   display: inline-flex;
