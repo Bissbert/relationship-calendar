@@ -109,6 +109,52 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </div>
 </header>
 
+<section id="welcome" class="wrap welcome" aria-labelledby="welcome-title" hidden>
+  <form id="welcome-form" class="card welcome-card" novalidate>
+    <div class="welcome-step" data-step="1">
+      <h2 class="welcome-title" id="welcome-title" tabindex="-1">Who’s this calendar for?</h2>
+      <p class="welcome-text">Your names go at the top and into birthday reminders. Leave one blank if you like.</p>
+      <div class="row-2">
+        <label class="field">
+          <span class="field-label">Your name</span>
+          <input type="text" id="w-name-a" maxlength="40" autocomplete="given-name">
+        </label>
+        <label class="field">
+          <span class="field-label">Your partner’s name</span>
+          <input type="text" id="w-name-b" maxlength="40" autocomplete="off">
+        </label>
+      </div>
+    </div>
+
+    <div class="welcome-step" data-step="2" hidden>
+      <h2 class="welcome-title" tabindex="-1">When did you get together?</h2>
+      <p class="welcome-text">This starts the day counter and lets the calendar suggest your anniversary. Skip it if you would rather not say.</p>
+      <label class="field welcome-since">
+        <span class="field-label">Together since</span>
+        <input type="date" id="w-since">
+      </label>
+    </div>
+
+    <div class="welcome-step" data-step="3" hidden>
+      <h2 class="welcome-title" tabindex="-1">Add the dates you already know</h2>
+      <p class="welcome-text">Each one repeats on its own and comes with a reminder. You can change or delete any of them later.</p>
+      <div class="checks" id="w-ticks"></div>
+      <div class="welcome-fields" id="w-fields"></div>
+    </div>
+
+    <div class="welcome-nav">
+      <button type="button" class="btn btn-quiet" id="w-back" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-left"/></svg><span>Back</span>
+      </button>
+      <span class="welcome-progress" id="w-progress" aria-live="polite">Step 1 of 3</span>
+      <button type="submit" class="btn btn-primary" id="w-next">
+        <span id="w-next-label">Next</span><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg>
+      </button>
+    </div>
+    <button type="button" class="welcome-skip" id="w-skip">Skip setup, I’ll add dates myself</button>
+  </form>
+</section>
+
 <main class="wrap board">
   <section id="dates" class="dates" aria-labelledby="dates-heading" tabindex="-1">
     <div class="dates-head">
@@ -242,6 +288,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
             <span id="submit-label">Add date</span>
           </button>
           <button type="button" class="btn btn-quiet" id="cancel-edit" hidden>Cancel</button>
+          <button type="button" class="btn btn-danger-paper" id="delete-edit" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+            <span>Delete this date</span>
+          </button>
         </div>
       </form>
 
@@ -314,11 +364,25 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
     </div>
   </div>
-  <div class="danger-row">
-    <button type="button" class="btn btn-danger btn-small" id="clear-btn">
+  <div class="start-over" id="start-over">
+    <div class="start-over-text">
+      <h3 class="take-title">Start over</h3>
+      <p class="take-text">Removes every date from this browser. Your names and start date stay. Save a backup first if you might want the dates back later.</p>
+    </div>
+    <button type="button" class="btn btn-danger" id="clear-btn">
       <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
-      <span>Remove all dates</span>
+      <span>Remove all dates…</span>
     </button>
+    <div class="clear-confirm" id="clear-confirm" role="group" aria-labelledby="clear-question" hidden>
+      <p class="clear-question" id="clear-question"></p>
+      <div class="take-actions">
+        <button type="button" class="btn btn-danger-solid" id="clear-yes">
+          <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+          <span id="clear-yes-label">Yes, remove them</span>
+        </button>
+        <button type="button" class="btn btn-ghost-light" id="clear-no">Keep them</button>
+      </div>
+    </div>
   </div>
 </section>
 

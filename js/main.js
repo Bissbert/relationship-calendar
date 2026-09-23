@@ -8,6 +8,7 @@ import {
 import { CATEGORIES, REPEATS, REMINDERS, newId, normalizeEvent, load, save, sortEvents, merge } from './model.js';
 import { MILESTONE_SETS, milestones } from './milestones.js';
 import { availablePresets } from './presets.js';
+import { WELCOMED_KEY, shouldWelcome, welcomeChoices, welcomeEvents } from './welcome.js';
 import { toICS, fromICS } from './ics.js';
 import { shareLink, readShareLink, toBackup, fromBackup, googleCalendarLink, download } from './share.js';
 
@@ -95,8 +96,27 @@ function formatTime(event) {
 
 // ------------------------------------------------------------ toast
 
+// The toast waits while it is hovered or focused, so Undo never slips away
+// mid-reach.
 let toastTimer = 0;
 let toastUndo = null;
+let toastLeft = 0;
+let toastStarted = 0;
+let toastPaused = false;
+
+function hideToast() {
+  clearTimeout(toastTimer);
+  $('toast').hidden = true;
+  toastUndo = null;
+}
+
+function runToastTimer(ms) {
+  clearTimeout(toastTimer);
+  toastPaused = false;
+  toastLeft = ms;
+  toastStarted = Date.now();
+  toastTimer = setTimeout(hideToast, ms);
+}
 
 function toast(message, undo = null) {
   const box = $('toast');
@@ -104,14 +124,29 @@ function toast(message, undo = null) {
   toastUndo = undo;
   $('toast-action').hidden = !undo;
   box.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { box.hidden = true; toastUndo = null; }, undo ? 9000 : 5000);
+  runToastTimer(undo ? 12000 : 5000);
 }
+
+function pauseToast() {
+  if ($('toast').hidden || toastPaused) return;
+  toastPaused = true;
+  clearTimeout(toastTimer);
+  toastLeft = Math.max(0, toastLeft - (Date.now() - toastStarted));
+}
+
+function resumeToast() {
+  if ($('toast').hidden || !toastPaused || $('toast').matches(':hover, :focus-within')) return;
+  runToastTimer(Math.max(toastLeft, 3000));
+}
+
+$('toast').addEventListener('pointerenter', pauseToast);
+$('toast').addEventListener('pointerleave', resumeToast);
+$('toast').addEventListener('focusin', pauseToast);
+$('toast').addEventListener('focusout', () => setTimeout(resumeToast));
 
 $('toast-action').addEventListener('click', () => {
   const fn = toastUndo;
-  toastUndo = null;
-  $('toast').hidden = true;
+  hideToast();
   fn?.();
 });
 
@@ -148,13 +183,14 @@ function ticket(event, occ, { past = false, big = false, now = today() } = {}) {
   const label = `${event.title}, ${formatLong(occ)}, ${when}`;
 
   const side = [el('span', { class: `when${occ === now ? ' is-today' : ''}`, text: when })];
-  if (!big) {
-    side.push(el('div', { class: 'ticket-actions' }, [
-      el('button', { type: 'button', class: 'icon-btn', 'data-edit': event.id, 'aria-label': `Edit “${event.title}”`, on: { click: () => startEdit(event.id) } }, icon('pencil')),
-      el('a', { class: 'icon-btn', href: googleCalendarLink(event), target: '_blank', rel: 'noopener', 'aria-label': `Add “${event.title}” to Google Calendar (opens in a new tab)` }, icon('cal-plus')),
-      el('button', { type: 'button', class: 'icon-btn', 'aria-label': `Delete “${event.title}”`, on: { click: () => removeEvent(event.id) } }, icon('trash')),
-    ]));
-  }
+
+  // Labelled actions on every ticket, the big one too. Delete sits apart at
+  // the far end and wears the danger ink, so it is never mistaken for Edit.
+  const actions = el('div', { class: 'ticket-actions' }, [
+    el('button', { type: 'button', class: 'ticket-action', 'data-edit': event.id, 'aria-label': `Edit “${event.title}”`, on: { click: () => startEdit(event.id) } }, [icon('pencil'), el('span', { text: 'Edit' })]),
+    el('a', { class: 'ticket-action', href: googleCalendarLink(event), target: '_blank', rel: 'noopener', 'aria-label': `Add “${event.title}” to Google Calendar (opens in a new tab)` }, [icon('cal-plus'), el('span', { text: 'Google Calendar' })]),
+    el('button', { type: 'button', class: 'ticket-action ticket-action-delete', 'aria-label': `Delete “${event.title}”`, on: { click: () => removeEvent(event.id) } }, [icon('trash'), el('span', { text: 'Delete' })]),
+  ]);
 
   const body = el('div', { class: 'ticket-body' }, [
     el('div', {}, [
@@ -163,6 +199,7 @@ function ticket(event, occ, { past = false, big = false, now = today() } = {}) {
     ]),
     el('div', { class: 'ticket-side' }, side),
     !big && event.notes ? el('p', { class: 'ticket-notes', text: event.notes }) : null,
+    actions,
   ]);
 
   const card = el('article', { class: `ticket${past ? ' is-past' : ''}`, 'aria-label': label }, [
@@ -483,6 +520,7 @@ function renderTakeaway() {
   const n = state.events.length;
   $('export-label').textContent = n ? `Download calendar file · ${plural(n, 'date')}` : 'Download calendar file';
   for (const id of ['export-btn', 'share-btn', 'backup-btn', 'clear-btn']) $(id).disabled = !n;
+  if (!n && !$('clear-confirm').hidden) askClear(false);
 }
 
 // ------------------------------------------------------------ settings
@@ -636,6 +674,7 @@ function setSubmitMode(editing) {
   $('submit-label').textContent = editing ? 'Save changes' : 'Add date';
   $('submit-btn').querySelector('use').setAttribute('href', editing ? '#i-check' : '#i-plus');
   $('cancel-edit').hidden = !editing;
+  $('delete-edit').hidden = !editing;
   document.querySelector('.composer .card').classList.toggle('is-editing', editing);
   renderQuickPicks();
 }
@@ -714,6 +753,8 @@ $('cancel-edit').addEventListener('click', () => {
   resetForm();
   document.querySelector(`[data-edit="${id}"]`)?.focus();
 });
+
+$('delete-edit').addEventListener('click', () => removeEvent(ui.editingId));
 
 $('event-form').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -906,13 +947,127 @@ $('import-input').addEventListener('change', async (e) => {
   }
 });
 
-$('clear-btn').addEventListener('click', () => {
+// Removing everything asks once, in place, and names how many dates go.
+function askClear(open) {
+  $('clear-btn').hidden = open;
+  $('clear-confirm').hidden = !open;
+  if (open) {
+    const n = state.events.length;
+    const what = n === 1 ? 'your one date' : `all ${plural(n, 'date')}`;
+    $('clear-question').textContent = `Remove ${what}? You can undo it from the message that appears afterwards.`;
+    $('clear-yes-label').textContent = n === 1 ? 'Yes, remove it' : `Yes, remove all ${n}`;
+    $('clear-no').focus();
+  }
+}
+
+$('clear-btn').addEventListener('click', () => { if (state.events.length) askClear(true); });
+$('clear-no').addEventListener('click', () => { askClear(false); $('clear-btn').focus(); });
+$('clear-confirm').addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  askClear(false);
+  $('clear-btn').focus();
+});
+$('clear-yes').addEventListener('click', () => {
   const n = state.events.length;
+  askClear(false);
   if (!n) return;
   resetForm();
-  change(`Removed ${plural(n, 'date')}.`, () => {
+  change(n === 1 ? 'Removed your one date.' : `Removed all ${plural(n, 'date')}.`, () => {
     state.events = [];
   });
+  document.querySelector('#dates').focus({ preventScroll: true });
+});
+
+// ------------------------------------------------------------ first run
+
+// A three-step setup for a brand-new calendar: names, start date, then the
+// dates most couples know by heart. Names and start date save as they are
+// typed, like the settings form; the dates are added in one undoable step.
+const WELCOME_STEPS = 3;
+let welcomeStep = 1;
+
+function rememberWelcomed() {
+  try { localStorage.setItem(WELCOMED_KEY, '1'); } catch { /* ignore */ }
+}
+
+function openWelcome() {
+  document.body.classList.add('is-welcoming');
+  $('welcome').hidden = false;
+  $('w-name-a').value = state.settings.names[0];
+  $('w-name-b').value = state.settings.names[1];
+  $('w-since').value = state.settings.since;
+  showWelcomeStep(1, false);
+}
+
+function closeWelcome() {
+  document.body.classList.remove('is-welcoming');
+  $('welcome').hidden = true;
+}
+
+function showWelcomeStep(step, focus = true) {
+  welcomeStep = step;
+  for (const panel of document.querySelectorAll('.welcome-step')) panel.hidden = Number(panel.dataset.step) !== step;
+  if (step === WELCOME_STEPS) buildWelcomeDates();
+  $('w-back').hidden = step === 1;
+  $('w-progress').textContent = `Step ${step} of ${WELCOME_STEPS}`;
+  $('w-next-label').textContent = step === WELCOME_STEPS ? 'Start my calendar' : 'Next';
+  if (focus) document.querySelector(`.welcome-step[data-step="${step}"] .welcome-title`).focus();
+}
+
+function buildWelcomeDates() {
+  const { ticks, fields } = welcomeChoices(state.settings, today());
+  const rule = (p) => `${REPEATS[p.repeat]}, reminder ${REMINDERS[p.reminder].toLowerCase()}`;
+  $('w-ticks').replaceChildren(...ticks.map((p) => el('label', { class: 'check' }, [
+    el('input', { type: 'checkbox', name: p.key, checked: p.checked }),
+    el('span', {}, [p.label, el('small', { text: `${rule(p)} · first on ${formatDate(p.date)}` })]),
+  ])));
+  $('w-fields').replaceChildren(...fields.map((p) => el('label', { class: 'field' }, [
+    el('span', { class: 'field-label' }, [p.title, ' ', el('span', { class: 'optional', text: '(optional)' })]),
+    el('input', { type: 'date', name: p.key }),
+    el('span', { class: 'field-hint', text: p.category === 'birthday' ? 'Birth date is fine; it repeats yearly.' : rule(p) }),
+  ])));
+}
+
+function syncWelcomeSettings() {
+  state.settings.names = [$('w-name-a').value.trim().slice(0, 40), $('w-name-b').value.trim().slice(0, 40)];
+  state.settings.since = isValidDate($('w-since').value) ? $('w-since').value : '';
+  persist();
+  syncSettingsInputs();
+  render();
+}
+
+function finishWelcome() {
+  const ticked = new Set([...$('w-ticks').querySelectorAll('input:checked')].map((i) => i.name));
+  const dates = Object.fromEntries([...$('w-fields').querySelectorAll('input')].map((i) => [i.name, i.value]));
+  const added = welcomeEvents(state.settings, today(), ticked, dates);
+  rememberWelcomed();
+  closeWelcome();
+  if (state.settings.since && !$('m-since').value) $('m-since').value = state.settings.since;
+  if (added.length) {
+    for (const e of added) ui.fresh.add(e.id);
+    change(`Added ${plural(added.length, 'date')}. Delete or edit any of them from its ticket.`, () => {
+      state.events.push(...added);
+    });
+  } else {
+    render();
+  }
+  document.querySelector('#dates').focus({ preventScroll: true });
+}
+
+$('welcome-form').addEventListener('input', (e) => {
+  if (e.target.closest('.welcome-step[data-step="1"], .welcome-step[data-step="2"]')) syncWelcomeSettings();
+});
+$('welcome-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (welcomeStep < WELCOME_STEPS) showWelcomeStep(welcomeStep + 1);
+  else finishWelcome();
+});
+$('w-back').addEventListener('click', () => showWelcomeStep(welcomeStep - 1));
+$('w-skip').addEventListener('click', () => {
+  rememberWelcomed();
+  closeWelcome();
+  render();
+  $('f-title').focus();
 });
 
 // ------------------------------------------------------------ share links
@@ -920,6 +1075,7 @@ $('clear-btn').addEventListener('click', () => {
 async function checkShareLink() {
   const data = await readShareLink(location.hash);
   if (!location.hash.startsWith('#share=')) return;
+  closeWelcome();
   const clear = () => history.replaceState(null, '', `${location.pathname}${location.search}`);
   const banner = $('share-banner');
   if (!data || !data.events.length) {
@@ -952,6 +1108,9 @@ try {
   if (localStorage.getItem('relationship-calendar:view') === 'month') setView('month');
 } catch { /* ignore */ }
 render();
+let welcomed = false;
+try { welcomed = Boolean(localStorage.getItem(WELCOMED_KEY)); } catch { /* ignore */ }
+if (shouldWelcome(state, location.hash, welcomed)) openWelcome();
 checkShareLink();
 
 // Keep "today" honest for tabs left open overnight.

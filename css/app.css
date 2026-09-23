@@ -41,6 +41,9 @@
   --rose-deep: #a13a57;
   --gold: #dcb56c;
   --danger: #a3262f;
+  --danger-wash: #f5dcdc;
+  --danger-on-lining: #f2b3b8;
+  --danger-line: #7c2b35;
 
   /* kinds (marks on paper; always paired with an icon and label) */
   --k-anniversary: #9b2743;
@@ -170,8 +173,12 @@ code {
 .btn-ghost-light:hover { background: var(--lining-raised); border-color: #8a4458; }
 .btn-quiet { background: transparent; color: var(--ink); border-color: var(--paper-line); }
 .btn-quiet:hover { background: var(--paper-deep); }
-.btn-danger { background: transparent; color: #f2b3b8; border-color: #7c2b35; }
+.btn-danger { background: transparent; color: var(--danger-on-lining); border-color: var(--danger-line); }
 .btn-danger:hover { background: #5a1520; color: #fff; }
+.btn-danger-solid { background: var(--danger); color: #fff; }
+.btn-danger-solid:hover { background: #861d25; }
+.btn-danger-paper { background: transparent; color: var(--danger); border-color: #d7a5a8; }
+.btn-danger-paper:hover { background: var(--danger-wash); }
 
 .icon-btn {
   display: inline-grid;
@@ -389,8 +396,36 @@ code {
   white-space: nowrap;
 }
 .when.is-today { color: #fff; background: var(--rose-deep); padding: 0.25rem 0.5rem; border-radius: 999px; }
-.ticket-actions { display: flex; gap: 0.1rem; margin-right: -0.25rem; }
-.ticket-actions .icon-btn { width: 2.25rem; height: 2.25rem; }
+/* The action strip sits under a dashed tear line, like the stub's. */
+.ticket-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.35rem -0.35rem -0.35rem -0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--paper-line);
+}
+.ticket-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.65rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 600 0.8125rem/1.2 var(--font-ui);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.ticket-action .icon { width: 1.05rem; height: 1.05rem; }
+.ticket-action:hover { background: var(--paper-deep); color: var(--ink); }
+.ticket-action-delete { margin-left: auto; color: var(--danger); }
+.ticket-action-delete:hover { background: var(--danger-wash); color: var(--danger); }
+@media (pointer: coarse) { .ticket-action { min-height: 2.75rem; } }
 .ticket-notes {
   grid-column: 1 / -1;
   margin: 0.15rem 0 0;
@@ -636,6 +671,45 @@ code {
 .day-detail-head h3 { margin: 0; font: 400 1.25rem/1.2 var(--font-display); }
 .day-detail-empty { margin: 0; color: var(--on-lining-soft); }
 
+/* ------------------------------------------------------------ first run */
+
+/* While the setup runs, the lining shows only the names (filling in live)
+   and the setup card; the empty board waits until there is something on it. */
+.is-welcoming .board,
+.is-welcoming .takeaway,
+.is-welcoming .top .next,
+.is-welcoming #together,
+.is-welcoming #settings,
+.is-welcoming #settings-toggle { display: none; }
+.is-welcoming .top { padding-bottom: 1.5rem; }
+
+.welcome { padding-bottom: clamp(3rem, 6vw, 5rem); }
+.welcome-card { display: grid; gap: 1.25rem; max-width: 40rem; padding: clamp(1.25rem, 4vw, 2rem); }
+.welcome-step { display: grid; gap: 1rem; }
+.welcome-step[hidden] { display: none; }
+.welcome-title { margin: 0; font: 400 clamp(1.5rem, 4vw, 2rem)/1.15 var(--font-display); }
+.welcome-title:focus { outline: none; }
+.welcome-text { margin: -0.25rem 0 0; color: var(--ink-soft); max-width: 34rem; }
+.welcome-since { max-width: 16rem; }
+.welcome-fields { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); padding-top: 1rem; border-top: 1px dashed var(--paper-line); }
+.welcome-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--paper-line); }
+.welcome-progress { margin-left: auto; font-size: 0.875rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.welcome-skip {
+  justify-self: start;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 500 0.875rem var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.welcome-skip:hover { color: var(--ink); }
+@media (max-width: 30rem) {
+  .welcome-nav .btn-primary { flex: 1 1 100%; order: 3; }
+}
+
 /* ------------------------------------------------------------ composer */
 
 .card {
@@ -811,7 +885,24 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .take-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .file-btn { position: relative; }
 .file-btn:focus-within { outline: 2px solid var(--rose); outline-offset: 2px; }
-.danger-row { margin-top: 1.5rem; }
+/* Start over is kept apart from the everyday cards: its own row, a danger
+   hairline instead of a raised fill, and a confirm step in place. */
+.start-over {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius);
+}
+.start-over-text { display: grid; gap: 0.4rem; flex: 1 1 22rem; }
+.start-over .take-text { margin: 0; }
+.clear-confirm { display: grid; gap: 0.75rem; flex: 1 1 100%; }
+.clear-question { margin: 0; font-weight: 600; color: var(--on-lining); }
+
 
 .foot {
   display: flex;
