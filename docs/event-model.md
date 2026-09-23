@@ -47,8 +47,8 @@ reads that key and immediately repaints the preview. This is convenient for a
 single browser, but it is not synchronization: another browser, device, or
 origin has a separate store.
 
-The current linear submit path has a source-level mismatch: the HTML field is
-`recurring-end`, while the handler looks up `linear-end`. As a result, the
-linear branch reads `.value` from `null` and the entry is not appended. The
-overview lists this as a known limitation because this documentation pass does
-not change behavior.
+At the time of this pass the linear submit path had a source-level mismatch:
+the HTML field is `recurring-end`, while the handler looked up `linear-end`, so
+the linear branch read `.value` from `null` and the entry was not appended.
+That defect has since been fixed on the default branch — the handler reads
+`recurring-end` — and is recorded in [Bugs found](BUGS-FOUND.md).
