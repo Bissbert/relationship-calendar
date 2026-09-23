@@ -28,7 +28,7 @@ The screenshots use the fictional couple Robin & Kai.
 | Edit, delete and undo | Every ticket has labelled Edit and Delete buttons, and the edit form has "Delete this date". "Start over" removes all dates after an in-place confirmation that names the count. Every change shows a toast with **Undo** that waits while you point at it. |
 | Calendar export | A standards-compliant `.ics` file: all-day or timed events, `RRULE` repeats, `VALARM` reminders and stable UIDs, so importing again updates dates instead of duplicating them. |
 | Google Calendar | Each date has a link that opens it prefilled in Google Calendar. |
-| Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; opening the link offers to merge the dates. |
+| Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; an empty calendar loads the dates straight away; otherwise a dialog offers to add them next to yours or replace yours, with Undo either way. |
 | Backup and import | Download a JSON backup and restore it later, or import any `.ics` file from another calendar. |
 
 Dates from the first version of the app (stored under `relationshipEvents`)

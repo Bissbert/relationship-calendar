@@ -134,7 +134,7 @@ A deliberately narrow palette: one ink accent, one foil accent, one rare foil hi
 - **Stamp Ink** (`#3b3a97`): the violet-blue date-stamper ink from the THESIS. Used as the default interactive accent on paper surfaces — primary buttons, focus rings and the checked state of native form controls (`accent-color`), the active tab underline, the selected day in the month grid, and the `kind-birthday` category mark.
 
 ### Secondary
-- **Rose Foil** (`#eba6b1`): the accent for the velvet ground — link color, text-selection background, the input caret, the share banner background, and the `btn-rose` call-to-action used for "Copy share link," "Download calendar file" and "Add them." A deeper tone, **Rose Deep** (`#a13a57`), renders the ticket's date/time line and the "today" badge fill — always on paper, never on velvet.
+- **Rose Foil** (`#eba6b1`): the accent for the velvet ground — link color, text-selection background, the input caret, and the `btn-rose` call-to-action used for "Copy share link" and "Download calendar file." A deeper tone, **Rose Deep** (`#a13a57`), renders the ticket's date/time line and the "today" badge fill — always on paper, never on velvet.
 
 ### Tertiary
 - **Gold Foil** (`#dcb56c`): the rarest color in the system, used only for the day-counter number beside the couple's names. It never becomes a background, a button, or a second accent — a single foil flourish, not a color family.
@@ -213,7 +213,7 @@ The signature silhouette is the ticket: a CSS `mask` built from two radial-gradi
 ### Buttons
 - **Shape:** fully round (999px), minimum 2.75rem tall (44px, meeting the 44px touch-target commitment in PRODUCT.md); `btn-small` steps down to 2.25rem for inline/secondary contexts.
 - **Primary** (`.btn-primary`): Stamp Ink fill, white text — used inside paper contexts (form submits: "Add date," "Add milestones").
-- **Rose** (`.btn-rose`): Rose fill, ink text — the primary call-to-action wherever the surrounding ground is velvet ("Copy share link," "Download calendar file," banner's "Add them").
+- **Rose** (`.btn-rose`): Rose fill, ink text — the primary call-to-action wherever the surrounding ground is velvet ("Copy share link," "Download calendar file").
 - **Ghost / Quiet:** `.btn-ghost-light` is transparent with an on-lining-line border, for secondary actions on velvet; `.btn-quiet` is transparent with a paper-line border and ink text, for secondary actions on paper.
 - **Danger:** three strengths, one per job. `.btn-danger` (velvet, outlined in Danger Line, Danger On-Lining text) opens the Start over confirm; `.btn-danger-paper` (paper, outlined, Danger text, Danger Wash on hover) is "Delete this date" in the edit form; `.btn-danger-solid` (Danger fill, white text) is only ever the final "Yes, remove all N". Every destructive button carries the trash icon and a verb; none is icon-only.
 - **Two-step removal:** removing one date is a single labelled click with a 12-second Undo toast. Removing everything first swaps "Remove all dates…" in place for a question that names the count ("Remove all 12 dates?"), a solid confirm and "Keep them" (focused, Escape also cancels). Nothing opens a modal.
@@ -249,6 +249,8 @@ Every ticket, the Next up hero included, ends with a labelled strip under a dash
 The paper toast at the bottom carries the Undo for every change. It stays 12 seconds when it has an Undo (5 otherwise) and pauses while hovered or focused, resuming with at least 3 seconds left, so Undo never slips away mid-reach.
 
 ### First-run setup
+Opening a share link never hides behind a banner. On an empty calendar the dates load straight away, with an Undo toast. Otherwise a modal paper card (`<dialog>`, velvet backdrop at 72%) names the sender ("Sam & Jess shared 4 dates with you"), says how many are new and how many are already there, and previews the next six in stamp type. Actions stack full width: Stamp "Add N dates to mine" (it merges, and is disabled with "Nothing new to add" when nothing is new), Danger-on-paper "Replace my dates with these", and quiet "Not now". Escape counts as Not now. Both changes can be undone from the toast.
+
 A brand-new calendar (no dates, no names, no start date) that was not opened from a share link shows a three-step paper card in place of the empty board: names (filling the velvet heading live), the day you got together, then the dates you already know (checkbox rows for picks with a known day; a "Milestones together" group with 1 month, 3 months, 100 days, 6 months, 500 days and 1,000 days, upcoming ones ticked and passed ones marked "Already passed"; optional date fields for birthdays, first date and moving in). Step titles are serif display, progress reads "Step 2 of 3" beside the buttons, and "Skip setup" is a plain underlined text button. Finishing adds everything in one undoable change; a `relationship-calendar:welcomed` flag keeps it from coming back.
 
 ## Do's and Don'ts

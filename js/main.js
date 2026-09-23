@@ -1085,25 +1085,65 @@ async function checkShareLink() {
   const data = await readShareLink(location.hash);
   if (!location.hash.startsWith('#share=')) return;
   closeWelcome();
-  const clear = () => history.replaceState(null, '', `${location.pathname}${location.search}`);
-  const banner = $('share-banner');
+  history.replaceState(null, '', `${location.pathname}${location.search}`);
   if (!data || !data.events.length) {
-    clear();
     toast('That share link is incomplete or damaged. Ask for a fresh one.');
     return;
   }
   const from = data.settings.names.filter(Boolean).join(' & ');
-  $('share-text').textContent = `${plural(data.events.length, 'shared date is', 'shared dates are')} ready to add${from ? ` from ${from}` : ''}.`;
-  banner.hidden = false;
-  $('share-accept').onclick = () => {
-    banner.hidden = true;
-    clear();
-    applyIncoming(data.events, data.settings, 'the share link');
+  const source = from ? `${from}’s link` : 'the share link';
+
+  // An empty calendar has nothing to lose, so the dates load straight away.
+  if (!state.events.length) {
+    applyIncoming(data.events, data.settings, source);
+    return;
+  }
+  openShareDialog(data, from, source);
+}
+
+// With dates of their own, the person chooses: add these next to theirs,
+// replace theirs, or leave it. Both changes can be undone from the toast.
+function openShareDialog(data, from, source) {
+  const n = data.events.length;
+  const { added, updated } = merge(state.events, data.events);
+  const fresh = added + updated;
+  const known = n - fresh;
+  const now = today();
+
+  $('share-title').textContent = from ? `${from} shared ${plural(n, 'date')} with you` : `${plural(n, 'date')} shared with you`;
+  $('share-text').textContent = !fresh
+    ? 'You already have all of these dates.'
+    : known ? `${fresh} ${fresh === 1 ? 'is' : 'are'} new to you; ${known} you already have and ${known === 1 ? 'stays' : 'stay'} as it is.`
+    : 'They go in next to your own dates. Nothing of yours is removed.';
+  const list = data.events
+    .map((e) => ({ title: e.title, date: nextOccurrence(e, now) || e.date }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  $('share-preview').replaceChildren(...list.slice(0, 6).map((e) => el('li', {}, [
+    el('span', { text: e.title }),
+    el('span', { class: 'd', text: formatDate(e.date) }),
+  ])));
+  if (n > 6) $('share-preview').append(el('li', { class: 'p', text: `and ${n - 6} more` }));
+  $('share-accept').textContent = fresh ? `Add ${plural(fresh, 'date')} to mine` : 'Nothing new to add';
+  $('share-accept').disabled = !fresh;
+
+  const dialog = $('share-dialog');
+  dialog.returnValue = '';
+  dialog.onclose = () => {
+    if (dialog.returnValue === 'add') applyIncoming(data.events, data.settings, source);
+    if (dialog.returnValue === 'replace') replaceWithShared(data, source);
   };
-  $('share-dismiss').onclick = () => {
-    banner.hidden = true;
-    clear();
-  };
+  dialog.showModal();
+  (fresh ? $('share-accept') : $('share-dismiss')).focus();
+}
+
+function replaceWithShared(data, source) {
+  for (const ev of data.events) ui.fresh.add(ev.id);
+  change(`Replaced your dates with ${plural(data.events.length, 'date')} from ${source}.`, () => {
+    state.events = sortEvents(data.events.map((e) => ({ ...e })));
+    if (!state.settings.names.some(Boolean)) state.settings.names = data.settings.names;
+    if (!state.settings.since) state.settings.since = data.settings.since;
+  });
+  syncSettingsInputs();
 }
 
 window.addEventListener('hashchange', checkShareLink);
