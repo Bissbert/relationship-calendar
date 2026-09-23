@@ -211,7 +211,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <aside class="composer" aria-labelledby="composer-heading">
     <div class="card">
       <div class="card-head">
-        <h2 id="composer-heading" class="card-title">Add a date</h2>
+        <div class="composer-top">
+          <h2 id="composer-heading" class="card-title">Add a date</h2>
+          <button type="button" class="composer-toggle" id="composer-toggle" aria-expanded="true" aria-controls="event-form milestone-form" aria-label="Show the form">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+          </button>
+        </div>
         <div class="tabs" role="tablist" aria-label="What to add">
           <button type="button" role="tab" class="tab" id="tab-single" aria-selected="true" aria-controls="event-form">One date</button>
           <button type="button" role="tab" class="tab" id="tab-milestones" aria-selected="false" aria-controls="milestone-form" tabindex="-1">Milestones</button>
