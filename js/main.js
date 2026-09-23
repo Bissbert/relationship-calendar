@@ -190,7 +190,7 @@ function ticket(event, occ, { past = false, big = false, now = today() } = {}) {
   // the far end and wears the danger ink, so it is never mistaken for Edit.
   const actions = el('div', { class: 'ticket-actions' }, [
     el('button', { type: 'button', class: 'ticket-action', 'data-edit': event.id, 'aria-label': `Edit “${event.title}”`, on: { click: () => startEdit(event.id) } }, [icon('pencil'), el('span', { text: 'Edit' })]),
-    el('a', { class: 'ticket-action', href: googleCalendarLink(event), target: '_blank', rel: 'noopener', 'aria-label': `Add “${event.title}” to Google Calendar (opens in a new tab)` }, [icon('cal-plus'), el('span', { text: 'Google Calendar' })]),
+    el('a', { class: 'ticket-action', href: googleCalendarLink(event), target: '_blank', rel: 'noopener', 'aria-label': `Add “${event.title}” to Google Calendar (opens in a new tab)` }, [icon('cal-plus'), el('span', {}, ['Google', el('span', { class: 'long', text: ' Calendar' })])]),
     el('button', { type: 'button', class: 'ticket-action ticket-action-delete', 'aria-label': `Delete “${event.title}”`, on: { click: () => removeEvent(event.id) } }, [icon('trash'), el('span', { text: 'Delete' })]),
   ]);
 
@@ -609,7 +609,23 @@ document.querySelector('.tabs').addEventListener('keydown', (e) => {
   $(toSingle ? 'tab-single' : 'tab-milestones').focus();
 });
 
+// On narrow screens the composer sits above the dates, so it folds down to
+// its heading until someone asks for it. Wide screens ignore the fold.
+function setComposerOpen(open) {
+  document.querySelector('.composer').classList.toggle('is-collapsed', !open);
+  const toggle = $('composer-toggle');
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.setAttribute('aria-label', open ? 'Hide the form' : 'Show the form');
+}
+
+$('composer-toggle').addEventListener('click', () => {
+  const open = $('composer-toggle').getAttribute('aria-expanded') !== 'true';
+  setComposerOpen(open);
+  if (open) focusComposer();
+});
+
 function focusComposer() {
+  setComposerOpen(true);
   const target = $('event-form').hidden ? $('m-since') : $('f-title');
   document.querySelector('.composer').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   target.focus({ preventScroll: true });
@@ -1099,7 +1115,7 @@ $('w-skip').addEventListener('click', () => {
   rememberWelcomed();
   closeWelcome();
   render();
-  $('f-title').focus();
+  focusComposer();
 });
 
 // ------------------------------------------------------------ share links
@@ -1176,6 +1192,7 @@ window.addEventListener('hashchange', checkShareLink);
 buildComposer();
 syncSettingsInputs();
 syncConditionalFields();
+setComposerOpen(!state.events.length);
 try {
   if (localStorage.getItem('relationship-calendar:view') === 'month') setView('month');
 } catch { /* ignore */ }
