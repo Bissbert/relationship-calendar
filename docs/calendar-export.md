@@ -1,49 +1,60 @@
-# Calendar export
+# Calendar export and sharing
 
 [← back to the overview](../README.md) · [documentation index](README.md)
 
-The download button does not send data to a server. It walks the current
-`events` array, expands each entry, formats each start and end value, and hands
-the resulting events to the vendored `ics.js` builder.
+Nothing leaves the browser unless the user exports or shares it, and even then
+no server is involved.
 
-## Export sequence
+## `.ics` export
+
+`js/ics.js` writes RFC 5545 text directly; no library is needed.
+
+- All-day dates use `DTSTART;VALUE=DATE` with an exclusive `DTEND`.
+- Timed dates use floating local time (`DTSTART:20260131T193000`), so a
+  dinner at 19:30 stays at 19:30 wherever the file is opened and no
+  `VTIMEZONE` block is needed.
+- Repeats become `RRULE:FREQ=…` with `UNTIL` when an end date is set.
+- Reminders become a `VALARM` that fires at 09:00 on the day, the day before
+  or a week before (or at the start time, if that is earlier).
+- UIDs are `<id>@relationship-calendar`, so importing the file again updates
+  the existing entries instead of duplicating them.
+- Text is escaped and lines are folded at 75 octets without splitting a UTF-8
+  character.
+
+## `.ics` import
+
+`fromICS` reads files from other calendars. It unfolds lines, handles
+`VALUE=DATE`, UTC and `TZID` start times, `DTEND` or `DURATION`, and maps
+`RRULE` with `FREQ` of `WEEKLY`, `MONTHLY` or `YEARLY` (plus `UNTIL` or
+`COUNT`). Rules the model cannot represent, such as `INTERVAL=2` or `BYDAY`,
+are imported as a single date and counted, and entries without a date are
+skipped and counted, so the user is told exactly what changed.
+
+## Google Calendar links
+
+Each ticket has a link to `calendar.google.com/calendar/render` with the
+title, dates, place, notes and repeat rule prefilled. It opens in a new tab;
+nothing is sent until the user saves it in Google Calendar.
+
+## Share links
 
 ```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as js/app.js
-    participant G as generateEventInstances
-    participant I as ics.js
-    participant F as FileSaver
-    participant C as Browser
-
-    U->>A: click Download .ics
-    loop each stored entry
-        A->>G: expand the entry
-        G-->>A: event instances
-        loop each instance
-            A->>I: addEvent(title, description, location, start, end)
-        end
-    end
-    A->>I: download Relationship_Calendar
-    I->>F: create Blob from VCALENDAR text
-    F->>C: save the .ics file
+flowchart LR
+    E["events + settings"] --> P["compact arrays<br/>(fixed field order)"]
+    P --> Z["deflate-raw<br/>CompressionStream"]
+    Z --> B["base64url"]
+    B --> L["https://…/#share=z…"]
+    L --> R["partner opens link"]
+    R --> M["merge banner<br/>merge() on accept"]
 ```
 
-Each generated instance uses the title, a description derived from that title,
-the fixed location from the form handler, and a formatted local start/end pair.
-The export library supplies the iCalendar envelope and the browser helper turns
-it into a download.
+The data sits in the URL fragment, which browsers do not send to the server.
+After the page reads it, it removes the fragment with `history.replaceState`
+so a reload does not offer the same merge again. Links over 8,000 characters
+still work but trigger a warning, since some chat apps cut long links.
 
-## Vendored browser helpers
+## Backups
 
-| File | Responsibility |
-|---|---|
-| `js/ics.min.js` | Builds the `VCALENDAR` and `VEVENT` text. |
-| `js/FileSaver.min.js` | Requests a browser download from a Blob. |
-| `js/Blob.js` | Provides compatibility support for Blob creation. |
-
-The single-event path was exercised in a local browser session without a
-reported browser error. The downloaded file's contents were not inspected in
-this pass, so export correctness is documented from the source path rather than
-reported as a measured result.
+The backup is a JSON file named `relationship-calendar-backup-YYYY-MM-DD.json`
+holding the events and settings. Importing it (or an `.ics` file, up to 5 MB)
+merges with the current dates using the same rules as a share link.

@@ -2,7 +2,8 @@
 """Report repository facts used in the documentation.
 
 This script deliberately uses only the Python standard library. It measures
-the files shipped by the static app and the PNGs captured for the README.
+the files the site serves (the same set tools/build-dist.sh copies) and the
+PNGs captured for the README.
 """
 
 from pathlib import Path
@@ -10,13 +11,8 @@ import struct
 
 
 ROOT = Path(__file__).resolve().parent.parent
-RUNTIME_FILES = (
-    Path("index.html"),
-    Path("js/app.js"),
-    Path("js/Blob.js"),
-    Path("js/ics.min.js"),
-    Path("js/FileSaver.min.js"),
-)
+TEXT_GLOBS = ("index.html", "favicon.svg", "_headers", "css/*.css", "js/*.js")
+BINARY_GLOBS = ("fonts/*.woff2",)
 
 
 def png_size(path):
@@ -32,22 +28,32 @@ def png_size(path):
         return width, height
 
 
-def report_file(path):
-    absolute = ROOT / path
-    text = absolute.read_text(encoding="utf-8")
-    return text.count("\n"), absolute.stat().st_size
+def collect(globs):
+    return [path for pattern in globs for path in sorted(ROOT.glob(pattern))]
 
 
 def main():
+    text_files = collect(TEXT_GLOBS)
+    fonts = collect(BINARY_GLOBS)
+
     total_lines = 0
     total_bytes = 0
-    print(f"Runtime files: {len(RUNTIME_FILES)}")
-    for path in RUNTIME_FILES:
-        lines, size = report_file(path)
+    print(f"Runtime files: {len(text_files) + len(fonts)}")
+    for path in text_files:
+        lines = path.read_text(encoding="utf-8").count("\n")
+        size = path.stat().st_size
         total_lines += lines
         total_bytes += size
-        print(f"{path}: {lines} lines, {size} bytes")
-    print(f"Runtime total: {total_lines} lines, {total_bytes} bytes")
+        print(f"{path.relative_to(ROOT)}: {lines} lines, {size} bytes")
+    print(f"Code total: {total_lines} lines, {total_bytes} bytes")
+
+    font_bytes = 0
+    for path in fonts:
+        size = path.stat().st_size
+        font_bytes += size
+        print(f"{path.relative_to(ROOT)}: {size} bytes")
+    print(f"Font total: {font_bytes} bytes")
+    print(f"Runtime total: {total_bytes + font_bytes} bytes")
 
     media = sorted((ROOT / "media").glob("*.png"))
     print(f"PNG media files: {len(media)}")

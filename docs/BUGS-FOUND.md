@@ -2,6 +2,10 @@
 
 [← back to the overview](../README.md) · [documentation index](README.md)
 
+> **Historical record.** The files these bugs refer to (`js/app.js` and the
+> old single-form `index.html`) were replaced by the rewrite described in the
+> overview. The line numbers below point into that first version.
+
 This ledger records defects found while documenting the application as it
 stood. The proposed diffs were deliberately not applied during the
 documentation pass itself.

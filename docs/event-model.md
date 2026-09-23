@@ -2,53 +2,54 @@
 
 [← back to the overview](../README.md) · [documentation index](README.md)
 
-`js/app.js` keeps a JavaScript array named `events`. Each entry carries a title,
-description, location, start date, and a pattern. Linear entries also carry an
-interval and an end date; the exponential path uses the fixed staged schedule in
-the source.
+`js/model.js` defines what a date is. Every path that brings data in (the
+form, a share link, a backup, an `.ics` import, stored data) goes through
+`normalizeEvent`, which returns a clean event or `null`.
 
-## From form to preview or export
+| Field | Values |
+|---|---|
+| `id` | Stable identifier; kept across export, share and import. |
+| `title` | Required, up to 120 characters. |
+| `date` | Required, a real calendar day as `YYYY-MM-DD`. |
+| `time`, `duration` | Optional `HH:MM` and 15 minutes to 24 hours. No time means all-day. |
+| `category` | `anniversary`, `birthday`, `date`, `trip`, `milestone` or `other`. |
+| `repeat`, `until` | `none`, `weekly`, `monthly` or `yearly`, with an optional last date. |
+| `reminder` | `none`, `day` (on the day), `1d` or `1w` before. |
+| `place`, `notes` | Optional text, up to 160 and 2,000 characters. |
+| `group` | Shared by dates created together, such as a milestone batch. |
+| `created`, `updated` | ISO timestamps; `updated` decides which copy wins in a merge. |
 
-```mermaid
-flowchart TD
-    E["Submit form"] --> V{"Title present?"}
-    V -- no --> D["Choose a pattern-specific default"]
-    V -- yes --> K["Keep entered title"]
-    D --> N["Create event entry"]
-    K --> N
-    N --> W["Append to events[]"]
-    W --> P["Persist JSON in localStorage"]
-    P --> R["Render title and pattern in preview"]
-    R --> Q{"User action"}
-    Q -- remove --> W2["Remove selected entry"]
-    W2 --> P
-    Q -- download --> X["Expand entry into calendar instances"]
+Settings hold the two names and the `since` date that drives the day counter
+and the milestone generator.
 
-    style N fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style P fill:#8250df,stroke:#bc8cff,color:#fff
-    style X fill:#238636,stroke:#3fb950,color:#fff
-```
+## Dates and repeats
 
-## Recurrence paths
+`js/dates.js` keeps dates as strings and does arithmetic on UTC midnights, so
+time zones and daylight-saving changes never shift a day. `occurrences(event,
+from, to)` expands repeats inside a window. Monthly and yearly repeats skip
+days that do not exist (the 31st in April, 29 February outside leap years), the
+same way calendar apps expand an `RRULE`, so what the page shows matches what
+the exported file produces.
 
-- `single` creates one instance from the base date.
-- `linear` advances the current date by the selected interval until the end
-  date.
-- `exponential` advances through the fixed weekly, monthly, and yearly stages
-  in `generateEventInstances`.
+## Milestones
 
-The preview does not expand these instances. It renders the entry's title,
-pattern label, and (for linear entries) the stored end-date text.
+`js/milestones.js` counts the start day as day 1, so "100 days together" is
+the start date plus 99 days, the way couples count. Month-based milestones
+clamp to the end of short months, so "1 month together" from 31 January lands
+on 28 February rather than disappearing. The composer skips milestones that
+already exist and, unless asked, ones in the past.
 
-## Persistence boundary
+## Storage and merging
 
-The serialized array is stored under `relationshipEvents`. Loading the page
-reads that key and immediately repaints the preview. This is convenient for a
-single browser, but it is not synchronization: another browser, device, or
-origin has a separate store.
+State is saved as JSON under `relationship-calendar:v2`. On first load the
+module converts the first version's `relationshipEvents` list, including its
+fixed "exponential" schedule, into ordinary dates.
 
-At the time of this pass the linear submit path had a source-level mismatch:
-the HTML field is `recurring-end`, while the handler looked up `linear-end`, so
-the linear branch read `.value` from `null` and the entry was not appended.
-That defect has since been fixed on the default branch — the handler reads
-`recurring-end` — and is recorded in [Bugs found](BUGS-FOUND.md).
+`merge(existing, incoming)` is used for share links and imports. A date with a
+known `id` replaces the local copy only if it was updated more recently; a
+date with the same title, day and time as an existing one is skipped. Local
+names and the start date are only filled in from incoming data when they are
+empty.
+
+`localStorage` belongs to one browser on one origin. Clearing site data
+removes the dates, which is why the takeaway section offers a backup file.

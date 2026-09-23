@@ -1,80 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relationship Calendar 💘</title>
-  <script src="js/ics.min.js" defer></script>
-  <script src="js/app.js" defer></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relationship Calendar</title>
+  <meta name="description" content="Keep your shared dates, anniversaries and milestones in one place and add them to any calendar app. Private: everything stays in your browser.">
+  <meta name="theme-color" content="#3a101d">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/young-serif.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/main.js"></script>
 </head>
-<body class="bg-[#efeff2] text-black font-sans min-h-screen flex flex-col items-center p-4">
-  <div class="w-full max-w-3xl bg-white rounded-2xl shadow-md p-6">
-    <h1 class="text-3xl font-bold text-center mb-4 text-[#a69eb0]">💘 Relationship Calendar</h1>
+<body>
+<!--
+THESIS: A couple's dates kept like ticket stubs in a velvet-lined keepsake box; the next date is always stamped front and centre. Refuses the generic form-over-list CRUD page.
+OWN-WORLD: Claret velvet lining, paper tickets with notched stubs, violet-blue date-stamper ink, rose and gold foil accents. Young Serif names, Figtree UI, Barlow Condensed stamp numerals. Icons drawn in one 1.75 stroke.
+STORY: The couple sees how long they have been together and what is next, adds or edits dates (or generates milestones), then sends them to their calendars or to each other.
+FIRST VIEWPORT: Names large on the lining, day counter beneath, the next-up ticket beside them; below, the ticket list with the composer card on the right (above the list on phones, since adding is the primary action), "Add date" as the primary action.
+FORM: user-pinned "Warm keepsake" direction (no roll; pinned beats the seed).
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M15.5 4.5l4 4L9 19l-5 1 1-5z"/><path d="M13.5 6.5l4 4"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/><path d="M10 11v5.5M14 11v5.5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M4 11V9.5A3.5 3.5 0 0 1 7.5 6H19"/><path d="M16 3l3 3-3 3"/><path d="M20 13v1.5a3.5 3.5 0 0 1-3.5 3.5H5"/><path d="M8 21l-3-3 3-3"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19.5h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5V4.5M7.5 9L12 4.5 16.5 9"/><path d="M5 19.5h14"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><path d="M4 5h16v4H4z"/><path d="M5.5 9v10h13V9"/><path d="M10 13h4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9.3 10v10M14.7 10v10M4 15h16M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="5" cy="6.5" r=".9"/><circle cx="5" cy="12" r=".9"/><circle cx="5" cy="17.5" r=".9"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 6l-6 6 6 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M8 5L4 9l4 4"/><path d="M4 9h10a5.5 5.5 0 0 1 0 11h-3"/></symbol>
+    <symbol id="i-cal-plus" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M12 12.5v5M9.5 15h5"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 16v4M16.5 18h4"/></symbol>
+    <symbol id="i-rings" viewBox="0 0 24 24"><circle cx="9" cy="14" r="5.5"/><circle cx="15" cy="14" r="5.5"/><path d="M10 4.5l2-1.5 2 1.5-2 2z"/></symbol>
+    <symbol id="i-cake" viewBox="0 0 24 24"><path d="M4.5 20.5h15V14a2 2 0 0 0-2-2h-11a2 2 0 0 0-2 2z"/><path d="M4.5 16c2.5 1.5 5 1.5 7.5 0s5-1.5 7.5 0"/><path d="M12 12V8.5"/><path d="M12 6.5c-1-1-1-2.2 0-3.5 1 1.3 1 2.5 0 3.5z"/></symbol>
+    <symbol id="i-glass" viewBox="0 0 24 24"><path d="M7 3.5h10l-.6 5.3A4.4 4.4 0 0 1 12 12.8a4.4 4.4 0 0 1-4.4-4L7 3.5z"/><path d="M12 12.8v7.2M8.5 20.5h7"/><path d="M7.4 7.5h9.2"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5v-2A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2M8 7.5v12M16 7.5v12"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5.5 21V4"/><path d="M5.5 4.5h11l-2 4 2 4h-11"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.2 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2L5.5 5.5"/></symbol>
+  </defs>
+</svg>
 
-    <section class="mb-8">
-      <h2 class="text-xl font-semibold mb-2">Add a New Memory</h2>
-      <form id="event-form" class="space-y-4">
-        <div>
-          <label for="start-date" class="block font-semibold">Start Date</label>
-          <input type="date" id="start-date" class="w-full border border-gray-300 p-2 rounded-xl" / required>
-        </div>
-        <div>
-          <label for="custom-event" class="block font-semibold">Event Title</label>
-          <input type="text" id="custom-event" placeholder="Special Moment 💖" class="w-full border border-gray-300 p-2 rounded-xl" />
-        </div>
-        <div>
-          <label class="flex items-center space-x-2">
-            <input type="checkbox" id="is-serial" class="form-checkbox h-4 w-4 text-[#a69eb0]" />
-            <span class="font-semibold">Make this a recurring (serial) event</span>
+<a class="skip" href="#dates">Skip to your dates</a>
+
+<div id="share-banner" class="banner" hidden>
+  <div class="banner-inner">
+    <svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>
+    <p id="share-text" class="banner-text"></p>
+    <div class="banner-actions">
+      <button type="button" class="btn btn-rose" id="share-accept">Add them</button>
+      <button type="button" class="btn btn-ghost-light" id="share-dismiss">Not now</button>
+    </div>
+  </div>
+</div>
+
+<header class="top">
+  <div class="wrap top-grid">
+    <div class="couple">
+      <div class="brand-row">
+        <p class="brand">
+          <svg class="brand-mark" aria-hidden="true"><use href="#i-heart"/></svg>
+          Relationship Calendar
+        </p>
+        <button type="button" class="btn btn-ghost-light btn-small" id="settings-toggle" aria-expanded="false" aria-controls="settings">
+          <svg class="icon" aria-hidden="true"><use href="#i-gear"/></svg>
+          <span>Names &amp; start date</span>
+        </button>
+      </div>
+      <h1 id="couple-names" class="names">Our calendar</h1>
+      <p id="together" class="together"></p>
+
+      <form id="settings" class="settings" hidden>
+        <div class="settings-grid">
+          <label class="field field-light">
+            <span class="field-label">First name</span>
+            <input type="text" id="name-a" maxlength="40" autocomplete="off">
+          </label>
+          <label class="field field-light">
+            <span class="field-label">Second name</span>
+            <input type="text" id="name-b" maxlength="40" autocomplete="off">
+          </label>
+          <label class="field field-light">
+            <span class="field-label">Together since</span>
+            <input type="date" id="since">
           </label>
         </div>
-        <div id="pattern-section" class="hidden space-y-4">
-          <div>
-            <label for="pattern-type" class="block font-semibold">Recurrence Pattern</label>
-            <select id="pattern-type" class="w-full border border-gray-300 p-2 rounded-xl">
-              <option value="linear">Linear</option>
-              <option value="exponential">Exponential</option>
-            </select>
-          </div>
-          <div id="linear-options" class="space-y-2">
-            <label for="linear-interval" class="block font-semibold">Linear Interval</label>
-            <select id="linear-interval" class="w-full border border-gray-300 p-2 rounded-xl">
-              <option value="7">Weekly</option>
-              <option value="30">Monthly</option>
-              <option value="365">Yearly</option>
-            </select>
-            <div>
-              <label for="recurring-end" class="block font-semibold">Repeat Until</label>
-              <input type="date" id="recurring-end" class="w-full border border-gray-300 p-2 rounded-xl" />
-            </div>
-          </div>
-        </div>
-        <button type="submit" class="bg-[#a69eb0] hover:bg-[#dadae3] text-gray-500 font-semibold py-2 px-4 rounded-xl w-full">
-          ➕ Add Event
-        </button>
+        <p class="settings-note">Used for the day counter and the milestone generator. Saved in this browser only.</p>
+        <button type="submit" class="btn btn-rose btn-small">Done</button>
       </form>
-    </section>
+    </div>
 
-    <section class="mb-6">
-      <h2 class="text-xl font-semibold mb-2">Your Memory List</h2>
-      <p class="text-sm text-gray-500 mb-2">Below is your current calendar. Click ✕ to remove any event.</p>
-      <div id="event-preview" class="space-y-2"></div>
+    <section class="next" aria-labelledby="next-label">
+      <h2 id="next-label" class="next-label">Next up</h2>
+      <div id="next-ticket"></div>
     </section>
+  </div>
+</header>
 
-    <section class="flex flex-col gap-2">
-      <button id="clear-btn" class="mb-2 bg-red-100 hover:bg-red-200 text-red-600 font-semibold py-2 px-4 rounded-xl w-full">🗑️ Clear All Events</button>
-<button id="download-btn" class="bg-[#f2e2cd] hover:bg-[#dadae3] text-black font-semibold py-2 px-4 rounded-xl w-full">
-        📥 Download .ics Calendar
+<main class="wrap board">
+  <section id="dates" class="dates" aria-labelledby="dates-heading" tabindex="-1">
+    <div class="dates-head">
+      <h2 id="dates-heading" class="section-title">Your dates</h2>
+      <div class="view-switch" role="group" aria-label="View">
+        <button type="button" class="seg" data-view="list" aria-pressed="true">
+          <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>List</span>
+        </button>
+        <button type="button" class="seg" data-view="month" aria-pressed="false">
+          <svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg><span>Month</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="filters" class="filters" role="group" aria-label="Filter by kind"></div>
+
+    <div id="list-view">
+      <div id="upcoming"></div>
+      <div class="past-toggle-row">
+        <button type="button" class="btn btn-ghost-light btn-small" id="past-toggle" aria-expanded="false" aria-controls="past" hidden>Show past dates</button>
+      </div>
+      <div id="past" hidden></div>
+    </div>
+
+    <div id="month-view" hidden>
+      <div class="month-sheet">
+        <div class="month-head">
+          <button type="button" class="icon-btn" id="month-prev" aria-label="Previous month">
+            <svg class="icon" aria-hidden="true"><use href="#i-left"/></svg>
+          </button>
+          <h3 id="month-title" class="month-title" aria-live="polite"></h3>
+          <button type="button" class="icon-btn" id="month-next" aria-label="Next month">
+            <svg class="icon" aria-hidden="true"><use href="#i-right"/></svg>
+          </button>
+          <button type="button" class="btn btn-quiet btn-small" id="month-today">Today</button>
+        </div>
+        <table class="month-grid" id="month-grid" role="grid" aria-labelledby="month-title"></table>
+      </div>
+      <div id="day-detail" class="day-detail"></div>
+    </div>
+  </section>
+
+  <aside class="composer" aria-labelledby="composer-heading">
+    <div class="card">
+      <div class="card-head">
+        <h2 id="composer-heading" class="card-title">Add a date</h2>
+        <div class="tabs" role="tablist" aria-label="What to add">
+          <button type="button" role="tab" class="tab" id="tab-single" aria-selected="true" aria-controls="event-form">One date</button>
+          <button type="button" role="tab" class="tab" id="tab-milestones" aria-selected="false" aria-controls="milestone-form" tabindex="-1">Milestones</button>
+        </div>
+      </div>
+
+      <form id="event-form" class="form" role="tabpanel" aria-labelledby="tab-single" novalidate>
+        <label class="field">
+          <span class="field-label">What</span>
+          <input type="text" id="f-title" name="title" maxlength="120" required placeholder="e.g. Our first date" autocomplete="off" aria-describedby="f-title-error">
+          <span class="field-error" id="f-title-error"></span>
+        </label>
+
+        <div class="row-2">
+          <label class="field">
+            <span class="field-label">Date</span>
+            <input type="date" id="f-date" name="date" required aria-describedby="f-date-error">
+            <span class="field-error" id="f-date-error"></span>
+          </label>
+          <label class="field">
+            <span class="field-label">Time <span class="optional">optional</span></span>
+            <input type="time" id="f-time" name="time" aria-describedby="f-time-hint">
+            <span class="field-hint" id="f-time-hint">Leave empty for an all-day date.</span>
+          </label>
+        </div>
+
+        <label class="field" id="duration-field" hidden>
+          <span class="field-label">How long</span>
+          <select id="f-duration" name="duration">
+            <option value="30">30 minutes</option>
+            <option value="60" selected>1 hour</option>
+            <option value="90">1½ hours</option>
+            <option value="120">2 hours</option>
+            <option value="180">3 hours</option>
+            <option value="240">4 hours</option>
+            <option value="480">8 hours</option>
+          </select>
+        </label>
+
+        <fieldset class="field kinds">
+          <legend class="field-label">Kind</legend>
+          <div class="kind-options" id="f-kinds"></div>
+        </fieldset>
+
+        <div class="row-2">
+          <label class="field">
+            <span class="field-label">Repeats</span>
+            <select id="f-repeat" name="repeat"></select>
+          </label>
+          <label class="field" id="until-field" hidden>
+            <span class="field-label">Until <span class="optional">optional</span></span>
+            <input type="date" id="f-until" name="until" aria-describedby="f-until-error">
+            <span class="field-error" id="f-until-error"></span>
+          </label>
+        </div>
+        <p class="field-hint" id="repeat-hint" hidden></p>
+
+        <label class="field">
+          <span class="field-label">Reminder</span>
+          <select id="f-reminder" name="reminder" aria-describedby="f-reminder-hint"></select>
+          <span class="field-hint" id="f-reminder-hint">Reminders go off at 9:00 in your calendar app.</span>
+        </label>
+
+        <details class="more" id="more-details">
+          <summary>Place and notes</summary>
+          <label class="field">
+            <span class="field-label">Where</span>
+            <input type="text" id="f-place" name="place" maxlength="160" autocomplete="off">
+          </label>
+          <label class="field">
+            <span class="field-label">Notes</span>
+            <textarea id="f-notes" name="notes" rows="3" maxlength="2000"></textarea>
+          </label>
+        </details>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+            <span id="submit-label">Add date</span>
+          </button>
+          <button type="button" class="btn btn-quiet" id="cancel-edit" hidden>Cancel</button>
+        </div>
+      </form>
+
+      <form id="milestone-form" class="form" role="tabpanel" aria-labelledby="tab-milestones" hidden novalidate>
+        <p class="form-intro">Pick the day you got together and we'll work out the dates worth celebrating.</p>
+        <label class="field">
+          <span class="field-label">Counting from</span>
+          <input type="date" id="m-since" required aria-describedby="m-since-error">
+          <span class="field-error" id="m-since-error"></span>
+        </label>
+        <fieldset class="field">
+          <legend class="field-label">Include</legend>
+          <div class="checks" id="m-sets"></div>
+        </fieldset>
+        <label class="check">
+          <input type="checkbox" id="m-past">
+          <span>Also add dates that have already passed</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="m-remind" checked>
+          <span>Remind us 1 day before each one</span>
+        </label>
+        <div class="preview" aria-live="polite">
+          <p class="preview-count" id="m-count"></p>
+          <ol class="preview-list" id="m-preview"></ol>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="m-submit">
+            <svg class="icon" aria-hidden="true"><use href="#i-sparkle"/></svg>
+            <span id="m-submit-label">Add milestones</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </aside>
+</main>
+
+<section class="wrap takeaway" aria-labelledby="takeaway-heading">
+  <h2 id="takeaway-heading" class="section-title">Take your dates with you</h2>
+  <div class="takeaway-grid">
+    <div class="take">
+      <h3 class="take-title">Into your calendar</h3>
+      <p class="take-text">Download an <code>.ics</code> file and open it in Apple Calendar, Google Calendar or Outlook. Dates you add again later replace the old copies instead of doubling up.</p>
+      <button type="button" class="btn btn-rose" id="export-btn">
+        <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+        <span id="export-label">Download calendar file</span>
       </button>
-    </section>
+    </div>
+    <div class="take">
+      <h3 class="take-title">To your partner</h3>
+      <p class="take-text">Copy a link that carries your dates. When your partner opens it, they can add the dates to their own copy. Nothing is uploaded, and anyone with the link can read the dates.</p>
+      <button type="button" class="btn btn-rose" id="share-btn">
+        <svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>
+        <span>Copy share link</span>
+      </button>
+    </div>
+    <div class="take">
+      <h3 class="take-title">Backup and import</h3>
+      <p class="take-text">Save a backup file, or bring in a backup or any <code>.ics</code> file.</p>
+      <div class="take-actions">
+        <button type="button" class="btn btn-ghost-light" id="backup-btn">
+          <svg class="icon" aria-hidden="true"><use href="#i-archive"/></svg>
+          <span>Save backup</span>
+        </button>
+        <label class="btn btn-ghost-light file-btn">
+          <svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg>
+          <span>Import file</span>
+          <input type="file" id="import-input" accept=".ics,.json,text/calendar,application/json" class="visually-hidden">
+        </label>
+      </div>
+    </div>
   </div>
-  <div id="toast" class="hidden fixed bottom-4 right-4 rounded-xl bg-gray-900 px-4 py-2 text-white shadow-lg" role="status" aria-live="polite" aria-atomic="true">
-    <span id="toast-message"></span>
+  <div class="danger-row">
+    <button type="button" class="btn btn-danger btn-small" id="clear-btn">
+      <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+      <span>Remove all dates</span>
+    </button>
   </div>
+</section>
 
-<script src="js/Blob.js"></script>
-<script src="js/FileSaver.min.js"></script>
+<footer class="wrap foot">
+  <p>Everything stays in this browser. No account, no tracking, nothing uploaded.</p>
+  <p><a href="https://github.com/Bissbert/relationship-calendar">Source on GitHub</a></p>
+</footer>
 
+<div class="toast-region" role="status" aria-live="polite" aria-atomic="true">
+  <div id="toast" class="toast" hidden>
+    <span id="toast-text"></span>
+    <button type="button" class="toast-action" id="toast-action" hidden>
+      <svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>
+      <span>Undo</span>
+    </button>
+  </div>
+</div>
 </body>
 </html>
