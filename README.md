@@ -29,7 +29,7 @@ The screenshots use the fictional couple Robin & Kai.
 | Calendar export | A standards-compliant `.ics` file: all-day or timed events, `RRULE` repeats, `VALARM` reminders and stable UIDs, so importing again updates dates instead of duplicating them. |
 | Add to my calendar | On phones, one button hands the `.ics` file to the device calendar: iOS opens its "Add All" calendar sheet, Android opens the share sheet to pick a calendar app, and anything else falls back to a download. The calendar app always asks before adding. |
 | Google Calendar | Each date has a link that opens it prefilled in Google Calendar. |
-| Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; opening the link offers to merge the dates. |
+| Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; an empty calendar loads the dates straight away; otherwise a dialog offers to add them next to yours or replace yours, with Undo either way. |
 | Backup and import | Download a JSON backup and restore it later, or import any `.ics` file from another calendar. |
 
 Dates from the first version of the app (stored under `relationshipEvents`)

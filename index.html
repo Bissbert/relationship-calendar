@@ -55,16 +55,22 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 <a class="skip" href="#dates">Skip to your dates</a>
 
-<div id="share-banner" class="banner" hidden>
-  <div class="banner-inner">
-    <svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>
-    <p id="share-text" class="banner-text"></p>
-    <div class="banner-actions">
-      <button type="button" class="btn btn-rose" id="share-accept">Add them</button>
-      <button type="button" class="btn btn-ghost-light" id="share-dismiss">Not now</button>
+<dialog id="share-dialog" class="card share-dialog" aria-labelledby="share-title" aria-describedby="share-text">
+  <form method="dialog" class="share-dialog-body">
+    <p class="share-kicker">
+      <svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>
+      Shared with you
+    </p>
+    <h2 id="share-title" class="share-title"></h2>
+    <p id="share-text" class="share-text"></p>
+    <ol class="preview-list share-preview" id="share-preview"></ol>
+    <div class="share-actions">
+      <button type="submit" value="add" class="btn btn-primary" id="share-accept"></button>
+      <button type="submit" value="replace" class="btn btn-danger-paper" id="share-replace">Replace my dates with these</button>
+      <button type="submit" value="" class="btn btn-quiet" id="share-dismiss">Not now</button>
     </div>
-  </div>
-</div>
+  </form>
+</dialog>
 
 <header class="top">
   <div class="wrap top-grid">

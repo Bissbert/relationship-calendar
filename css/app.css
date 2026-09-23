@@ -196,23 +196,37 @@ code {
 .icon-btn .icon { width: 1.25rem; height: 1.25rem; }
 .icon-btn:focus-visible, .paper :focus-visible, .card :focus-visible, .ticket :focus-visible { outline-color: var(--stamp); }
 
-/* ------------------------------------------------------------ banner */
+/* ------------------------------------------------------------ share dialog */
 
-.banner { background: var(--rose); color: var(--ink); }
-.banner-inner {
-  width: min(100% - 2rem, 70rem);
-  margin-inline: auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem 1rem;
-  padding-block: 0.75rem;
+/* A share link opens as a modal so it can't be missed. The velvet page dims
+   behind it; the card is the same paper as the composer. */
+.share-dialog {
+  width: min(100% - 2rem, 30rem);
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  overflow: auto;
 }
-.banner-text { margin: 0; flex: 1 1 16rem; font-weight: 600; }
-.banner-actions { display: flex; gap: 0.5rem; }
-.banner .btn-rose { background: var(--ink); color: var(--paper); }
-.banner .btn-ghost-light { color: var(--ink); border-color: rgb(42 29 35 / 0.35); }
-.banner .btn-ghost-light:hover { background: rgb(255 255 255 / 0.3); }
+.share-dialog::backdrop { background: rgb(20 4 9 / 0.72); }
+.share-dialog-body { display: grid; gap: 0.9rem; padding: clamp(1.25rem, 5vw, 1.75rem); }
+.share-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--stamp);
+  font: 600 0.8125rem var(--font-stamp);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.share-title { margin: 0; font: 400 clamp(1.5rem, 5vw, 1.85rem)/1.15 var(--font-display); }
+.share-text { margin: -0.3rem 0 0; color: var(--ink-soft); }
+.share-preview { padding: 0.75rem 0.9rem; border-radius: calc(var(--radius) - 4px); background: var(--paper-deep); }
+.share-actions { display: grid; gap: 0.5rem; padding-top: 0.25rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .share-dialog[open] { animation: share-in 220ms var(--ease-out); }
+  @keyframes share-in { from { opacity: 0; transform: translateY(0.75rem); } }
+}
 
 /* ------------------------------------------------------------ header */
 
