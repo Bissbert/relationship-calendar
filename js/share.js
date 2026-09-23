@@ -118,3 +118,41 @@ export function download(filename, text, type) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+// How a phone hands a calendar file to its own calendar app. No web API can
+// write to the device calendar, so each route ends in a sheet the person
+// confirms:
+// - 'open': iOS shows its "Add All" calendar sheet when Safari opens a
+//   text/calendar file directly (a download would only land in Files).
+// - 'share': the share sheet, where the person picks their calendar app.
+// - 'download': the file lands in Downloads; tapping it opens the calendar.
+// iPadOS reports itself as a Mac, so touch points tell the two apart.
+export function deviceCalendarRoute({ userAgent = '', maxTouchPoints = 0, canShareFiles = false } = {}) {
+  const ios = /iPhone|iPad|iPod/.test(userAgent) || (/Macintosh/.test(userAgent) && maxTouchPoints > 1);
+  if (ios) return 'open';
+  return canShareFiles ? 'share' : 'download';
+}
+
+// Returns the route taken, or '' when the person closed the share sheet.
+export async function addToDeviceCalendar(filename, text) {
+  const file = new File([text], filename, { type: 'text/calendar' });
+  let canShareFiles = false;
+  try { canShareFiles = Boolean(navigator.canShare?.({ files: [file] })); } catch { /* unsupported */ }
+  const route = deviceCalendarRoute({ userAgent: navigator.userAgent, maxTouchPoints: navigator.maxTouchPoints, canShareFiles });
+
+  if (route === 'open') {
+    location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(text)}`;
+    return route;
+  }
+  if (route === 'share') {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return route;
+    } catch (error) {
+      if (error?.name === 'AbortError') return '';
+      // Anything else (no permission, a flaky share target): fall through.
+    }
+  }
+  download(filename, text, 'text/calendar');
+  return 'download';
+}
