@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T14:05:45Z",
+  "title": "Design System: Relationship Calendar",
+  "extensions": {
+    "colorMeta": {
+      "stamp": { "role": "primary", "displayName": "Stamp Ink", "canonical": "#3b3a97", "tonalRamp": ["#161537", "#262561", "#37368b", "#4746b6", "#6f6ec7", "#9998d8", "#c3c2e8", "#ededf8"] },
+      "rose": { "role": "secondary", "displayName": "Rose Foil", "canonical": "#eba6b1", "tonalRamp": ["#3e0e16", "#6e1926", "#9e2337", "#cd2e47", "#da5b70", "#e58b99", "#f0bbc3", "#faeaed"] },
+      "rose-deep": { "role": "secondary", "displayName": "Rose Deep", "canonical": "#a13a57", "tonalRamp": ["#38141e", "#632436", "#8e334d", "#b94364", "#ca6c86", "#d997a9", "#e9c1cc", "#f8ecf0"] },
+      "gold": { "role": "tertiary", "displayName": "Gold Foil", "canonical": "#dcb56c", "tonalRamp": ["#3e2d0f", "#6d501a", "#9c7325", "#cb9530", "#d8ae5d", "#e4c58c", "#efddbb", "#faf5ea"] },
+      "lining": { "role": "neutral", "displayName": "Lining", "canonical": "#3a101d", "tonalRamp": ["#3c111e", "#6a1d35", "#972a4c", "#c53663", "#d46285", "#e090a9", "#edbdcc", "#f9ebef"] },
+      "lining-raised": { "role": "neutral", "displayName": "Lining Raised", "canonical": "#4d1728", "tonalRamp": ["#3b121f", "#681f36", "#952c4d", "#c23a65", "#d16587", "#de92aa", "#ecbecd", "#f9ebf0"] },
+      "lining-line": { "role": "neutral", "displayName": "Lining Line", "canonical": "#6a2a3d", "tonalRamp": ["#371620", "#612638", "#8a3750", "#b44768", "#c67089", "#d799ab", "#e7c3ce", "#f8edf0"] },
+      "on-lining": { "role": "neutral", "displayName": "On Lining", "canonical": "#f7eee3", "tonalRamp": ["#3c2811", "#69471e", "#96662b", "#c48538", "#d2a063", "#dfbc90", "#ecd7be", "#f9f3eb"] },
+      "on-lining-soft": { "role": "neutral", "displayName": "On Lining Soft", "canonical": "#dcc2c9", "tonalRamp": ["#311c21", "#56313b", "#7b4654", "#a05c6e", "#b6808e", "#cba5af", "#e0cad0", "#f6eff1"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#f7efe4", "tonalRamp": ["#3b2a11", "#68491f", "#95692c", "#c28839", "#d1a364", "#dfbe91", "#ecd9be", "#f9f3eb"] },
+      "paper-deep": { "role": "neutral", "displayName": "Paper Deep", "canonical": "#ecdfcd", "tonalRamp": ["#372915", "#624825", "#8c6835", "#b68745", "#c8a26e", "#d8bd98", "#e8d8c2", "#f8f3ed"] },
+      "paper-line": { "role": "neutral", "displayName": "Paper Line", "canonical": "#d9c8b2", "tonalRamp": ["#332819", "#5a462d", "#816540", "#a88353", "#bd9f79", "#d0bba0", "#e3d7c7", "#f7f3ee"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#2a1d23", "tonalRamp": ["#2d1f26", "#503742", "#724f5f", "#95677c", "#ad8899", "#c5abb7", "#ddcdd5", "#f5f0f2"] },
+      "ink-soft": { "role": "neutral", "displayName": "Ink Soft", "canonical": "#62505a", "tonalRamp": ["#2a2227", "#4a3d44", "#6a5762", "#8a717f", "#a5919c", "#bfb1b9", "#d9d1d6", "#f4f1f2"] },
+      "danger": { "role": "neutral", "displayName": "Danger", "canonical": "#a3262f", "tonalRamp": ["#3e0e12", "#6d1920", "#9d252d", "#cc303b", "#d95d65", "#e48c92", "#efbbbf", "#faeaeb"] },
+      "k-anniversary": { "role": "category", "displayName": "Anniversary Mark", "canonical": "#9b2743", "tonalRamp": ["#3d0f1a", "#6c1b2f", "#9a2743", "#c93357", "#d75f7c", "#e28da2", "#eebcc8", "#faebee"] },
+      "k-birthday": { "role": "category", "displayName": "Birthday Mark", "canonical": "#3b3a97", "tonalRamp": ["#161537", "#262561", "#37368b", "#4746b6", "#6f6ec7", "#9998d8", "#c3c2e8", "#ededf8"] },
+      "k-date": { "role": "category", "displayName": "Date Mark", "canonical": "#a33b66", "tonalRamp": ["#381423", "#63243e", "#8e3359", "#b94373", "#ca6c93", "#d997b2", "#e9c1d2", "#f8ecf1"] },
+      "k-trip": { "role": "category", "displayName": "Trip Mark", "canonical": "#2b6650", "tonalRamp": ["#17362a", "#285f4a", "#39886b", "#4bb18b", "#72c4a5", "#9bd5bf", "#c4e6d9", "#edf7f4"] },
+      "k-milestone": { "role": "category", "displayName": "Milestone Mark", "canonical": "#86560f", "tonalRamp": ["#452c08", "#794e0e", "#ae6f13", "#e29119", "#ebaa4b", "#f1c37f", "#f7dcb4", "#fcf4e8"] },
+      "k-other": { "role": "category", "displayName": "Other Mark", "canonical": "#5b4852", "tonalRamp": ["#2b2226", "#4b3c44", "#6c5561", "#8c6f7e", "#a68f9b", "#c0b0b8", "#dad0d5", "#f4f1f2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The couple's names only." },
+      "title": { "displayName": "Title", "purpose": "Section, card, group and modal-level headings." },
+      "body": { "displayName": "Body", "purpose": "Running UI prose; 600-weight for button/tab/chip/field labels." },
+      "label": { "displayName": "Stamp Label", "purpose": "Dates, counters and short time-coded eyebrows — never prose." }
+    },
+    "shadows": [
+      { "name": "ticket", "value": "0 1px 1px rgb(20 4 9 / 0.35), 0 6px 14px -4px rgb(20 4 9 / 0.55)", "purpose": "Composer card and month sheet — rectangular paper containers lifting off the velvet." },
+      { "name": "ticket-drop", "value": "drop-shadow(0 1px 1px rgb(20 4 9 / 0.35)) drop-shadow(0 6px 10px rgb(20 4 9 / 0.45))", "purpose": "Applied to .ticket-wrap (filter, not box-shadow) because the ticket itself is CSS-masked and would clip a box-shadow." },
+      { "name": "toast", "value": "0 10px 30px -8px rgb(10 2 5 / 0.7)", "purpose": "The one floating overlay in the system; deliberately the heaviest shadow." },
+      { "name": "focus-ring", "value": "0 0 0 3px rgb(59 58 151 / 0.25)", "purpose": "Input focus ring on paper fields, paired with a border color shift to Stamp Ink; a focus cue, not a depth cue." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default easing for all transitions and the stamp-press/settle keyframes." },
+      { "name": "stamp-press", "value": "520ms var(--ease-out), keyframes rotate(-9deg) scale(1.45) opacity(0) blur(2px) -> rotate(-2deg) scale(0.94) -> rotate(-3deg) scale(1)", "purpose": "New-ticket stamp entrance; disabled under prefers-reduced-motion." },
+      { "name": "ticket-settle", "value": "420ms var(--ease-out), translateY(-6px) -> translateY(0)", "purpose": "New-ticket wrapper drop-in, paired with stamp-press." }
+    ],
+    "breakpoints": [
+      { "name": "row-collapse", "value": "22rem" },
+      { "name": "ticket-compact", "value": "30rem" },
+      { "name": "settings-3col", "value": "36rem" },
+      { "name": "month-compact", "value": "40rem" },
+      { "name": "takeaway-3col", "value": "48rem" },
+      { "name": "board-2col", "value": "60rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default submit action inside a paper context (e.g. \"Add date\").",
+      "html": "<button class=\"ds-btn-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Add date</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.55rem 1.1rem; border: 1px solid transparent; border-radius: 999px; background: #3b3a97; color: #fff; font: 600 1rem/1.2 'Figtree', sans-serif; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16,1,0.3,1), transform 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary .ds-icon { width: 1.15em; height: 1.15em; } .ds-btn-primary:hover { background: #2e2d80; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #3b3a97; outline-offset: 2px; }"
+    },
+    {
+      "name": "Rose Button",
+      "kind": "button",
+      "refersTo": "button-rose",
+      "description": "Primary call-to-action wherever the surrounding ground is the velvet lining (e.g. \"Copy share link\").",
+      "html": "<button class=\"ds-btn-rose\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1\"/><path d=\"M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1\"/></svg><span>Copy share link</span></button>",
+      "css": ".ds-btn-rose { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.55rem 1.1rem; border: 1px solid transparent; border-radius: 999px; background: #eba6b1; color: #2a1d23; font: 600 1rem/1.2 'Figtree', sans-serif; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16,1,0.3,1), transform 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-rose .ds-icon { width: 1.15em; height: 1.15em; } .ds-btn-rose:hover { background: #f3bdc6; } .ds-btn-rose:active { transform: translateY(1px); } .ds-btn-rose:focus-visible { outline: 2px solid #eba6b1; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button (on lining)",
+      "kind": "button",
+      "refersTo": "button-ghost-light",
+      "description": "Secondary action on the velvet ground (e.g. settings toggle, \"Not now\").",
+      "html": "<button class=\"ds-btn-ghost\"><span>Not now</span></button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.55rem 1.1rem; border: 1px solid #6a2a3d; border-radius: 999px; background: transparent; color: #f7eee3; font: 600 1rem/1.2 'Figtree', sans-serif; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-ghost:hover { background: #4d1728; border-color: #8a4458; } .ds-btn-ghost:focus-visible { outline: 2px solid #eba6b1; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Paper-ground text/date/time input; forces color-scheme: light so native pickers stay on the paper palette.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">What</span><input class=\"ds-input\" type=\"text\" placeholder=\"e.g. Our first date\"></label>",
+      "css": ".ds-field { display: grid; gap: 0.35rem; } .ds-field-label { font-weight: 600; font-size: 0.875rem; color: #2a1d23; font-family: 'Figtree', sans-serif; } .ds-input { width: 100%; min-height: 2.75rem; padding: 0.55rem 0.75rem; border: 1px solid #c9b59c; border-radius: 9px; background: #fffaf3; color: #2a1d23; font: 400 1rem/1.3 'Figtree', sans-serif; color-scheme: light; transition: border-color 160ms cubic-bezier(0.16,1,0.3,1), box-shadow 160ms cubic-bezier(0.16,1,0.3,1); } .ds-input::placeholder { color: #8b7780; } .ds-input:hover { border-color: #a8927a; } .ds-input:focus-visible { outline: none; border-color: #3b3a97; box-shadow: 0 0 0 3px rgba(59,58,151,0.25); }"
+    },
+    {
+      "name": "Segmented Toggle",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "List/Month view switch; pill track with a paper-filled active segment.",
+      "html": "<div class=\"ds-segment\" role=\"group\"><button class=\"ds-seg is-active\" aria-pressed=\"true\">List</button><button class=\"ds-seg\" aria-pressed=\"false\">Month</button></div>",
+      "css": ".ds-segment { display: inline-flex; padding: 0.2rem; border-radius: 999px; background: #4d1728; } .ds-seg { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.5rem; padding: 0.35rem 0.9rem; border: 0; border-radius: 999px; background: transparent; color: #dcc2c9; font: 600 0.875rem 'Figtree', sans-serif; cursor: pointer; } .ds-seg:hover { color: #f7eee3; } .ds-seg.is-active { background: #f7efe4; color: #2a1d23; }"
+    },
+    {
+      "name": "Composer Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Paper container that lifts off the velvet ground via the ticket shadow.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><h2 class=\"ds-card-title\">Add a date</h2></div><div class=\"ds-card-body\">Form content.</div></div>",
+      "css": ".ds-card { border-radius: 14px; background: #f7efe4; color: #2a1d23; box-shadow: 0 1px 1px rgba(20,4,9,0.35), 0 6px 14px -4px rgba(20,4,9,0.55); overflow: hidden; } .ds-card-head { padding: 1.1rem 1.25rem 0.75rem; border-bottom: 1px solid #d9c8b2; background: #ecdfcd; } .ds-card-title { margin: 0; font: 400 1.5rem/1.2 'Young Serif', Georgia, serif; } .ds-card-body { padding: 1.25rem; }"
+    },
+    {
+      "name": "Ticket",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Signature component: stub + body with a real CSS-mask notch silhouette, dashed tear line, and a rotated ink-stamp date badge colored by category.",
+      "html": "<div class=\"ds-ticket\"><div class=\"ds-ticket-stub\"><div class=\"ds-stamp\"><span class=\"ds-stamp-day\">14</span><span class=\"ds-stamp-month\">Feb</span></div></div><div class=\"ds-ticket-body\"><p class=\"ds-ticket-title\">Anniversary dinner</p><p class=\"ds-ticket-meta\">Anniversary · 7:00 PM</p></div></div>",
+      "css": ".ds-ticket { --notch: 0.5rem; --stub: 5.25rem; position: relative; display: grid; grid-template-columns: var(--stub) minmax(0,1fr); min-height: 5.5rem; background: #f7efe4; color: #2a1d23; border-radius: 9px; filter: drop-shadow(0 1px 1px rgba(20,4,9,0.35)) drop-shadow(0 6px 10px rgba(20,4,9,0.45)); mask: radial-gradient(circle at var(--stub) 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) top / 100% 51% no-repeat, radial-gradient(circle at var(--stub) 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) bottom / 100% 51% no-repeat; } .ds-ticket-stub { display: grid; place-items: center; padding: 0.6rem 0.4rem; border-right: 1.5px dashed #d9c8b2; } .ds-stamp { display: grid; justify-items: center; gap: 0.1rem; padding: 0.3rem 0.45rem 0.35rem; min-width: 3.6rem; border: 2px solid #9b2743; border-radius: 6px; box-shadow: inset 0 0 0 2px #f7efe4, inset 0 0 0 3px #9b2743; color: #9b2743; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; text-transform: uppercase; line-height: 1; transform: rotate(-3deg); } .ds-stamp-day { font-size: 1.85rem; } .ds-stamp-month { font-size: 0.75rem; letter-spacing: 0.12em; } .ds-ticket-body { padding: 0.75rem 0.6rem 0.75rem 1rem; } .ds-ticket-title { margin: 0; font-weight: 650; font-size: 1rem; } .ds-ticket-meta { margin: 0.3rem 0 0; font-size: 0.875rem; color: #62505a; }"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The system's single floating overlay, with an optional Undo action.",
+      "html": "<div class=\"ds-toast\"><span>Date removed</span><button class=\"ds-toast-action\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 5L4 9l4 4\"/><path d=\"M4 9h10a5.5 5.5 0 0 1 0 11h-3\"/></svg><span>Undo</span></button></div>",
+      "css": ".ds-toast { display: flex; align-items: center; gap: 1rem; max-width: 34rem; padding: 0.6rem 0.6rem 0.6rem 1.1rem; border-radius: 999px; background: #f7efe4; color: #2a1d23; box-shadow: 0 10px 30px -8px rgba(10,2,5,0.7); font-weight: 600; font-family: 'Figtree', sans-serif; } .ds-toast-action { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 2.25rem; padding: 0.3rem 0.85rem; border: 0; border-radius: 999px; background: #3b3a97; color: #fff; font: 600 0.875rem 'Figtree', sans-serif; cursor: pointer; } .ds-toast-action .ds-icon { width: 1.15em; height: 1.15em; } .ds-toast-action:hover { background: #2e2d80; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Velvet Keepsake Box",
+    "overview": "Relationship Calendar reads as a couple's dates kept like ticket stubs tucked into a velvet-lined box, not as a form sitting over a list. The page is built from exactly two grounds — a deep claret velvet lining that holds the header, the section chrome and the takeaway panels, and warm paper that every ticket, card and input sits on — and the system never blurs them into a third, in-between surface. Every interactive surface commits to one ground or the other: paper things get the violet-blue ink-stamp accent, velvet things get the rose foil accent, and nothing is shaded halfway to \"neutral\" gray. The signature device is the ticket itself: a real CSS-mask silhouette with two notch cutouts and a dashed tear line, topped with a rotated rubber-stamp badge in condensed numerals — built with actual geometry, not a texture image standing in for one.\n\nThe system refuses faked materiality. There is no paper-grain texture, no drop-shadow doing double duty as \"depth,\" no gradient standing in for velvet nap — the claret ground is two soft radial gradients plus a flat fill, and the \"paper\" is a flat warm off-white with a slightly different flat off-white for its secondary surface. Depth, where it exists at all, is reserved for the handful of paper set-pieces that need to visually lift off the velvet (the composer card, the month sheet, the ticket, the toast); every button, chip, input and badge is flat at rest. Browser chrome carries the world too: selection, caret, scrollbar track/thumb, and the accent-color of native checkboxes/date pickers are all themed, so the illusion doesn't break at the edges of authored markup.",
+    "keyCharacteristics": [
+      "Two grounds, two accents — velvet lining (rose) and paper (violet-blue stamp), never mixed.",
+      "The ticket is a real cut silhouette (CSS mask), not an illustrated or textured stand-in.",
+      "Flat by default; shadow is reserved for paper set-pieces sitting on velvet.",
+      "Barlow Condensed uppercase numerals do the \"rubber stamp\" work; Figtree stays plain for UI prose.",
+      "Pill radius on everything actionable; 14px/9px radius on everything static."
+    ],
+    "rules": [
+      { "name": "The Two Grounds Rule", "body": "Stamp Ink is the accent for things sitting on paper (buttons, inputs, focus rings, checked states inside the composer and tickets). Rose is the accent for things sitting on velvet (links, primary CTAs, selection, caret). A control never borrows the other ground's accent.", "section": "colors" },
+      { "name": "The Foil Is Rare Rule", "body": "Gold appears exactly once, on the day-counter numeral. It does not recur as a button, a border, or a second brand color — its rarity is what makes it read as foil rather than paint.", "section": "colors" },
+      { "name": "The Stamp Numerals Rule", "body": "Barlow Condensed 600 uppercase is reserved for dates, counters and short time-coded labels — never for running prose, button copy or field labels, which stay in Figtree.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Shadow only appears on paper set-pieces sitting on the velvet ground (card, month-sheet, ticket, toast). Nothing else — not a button, not a chip, not a badge — casts one at rest.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Stamp Ink as the accent for anything sitting on paper, and Rose as the accent for anything sitting on velvet lining — check the ground before picking the accent.",
+      "Do build any new ticket-like or stub-like shape with a real CSS mask/clip-path, keyed off a --stub-style custom property, never with a background image or texture.",
+      "Do keep new actionable controls fully round (999px) and new static containers on the 9px/14px pair — don't introduce a third radius.",
+      "Do reserve Barlow Condensed uppercase for dates, counters and short time-coded labels; keep prose, buttons and field labels in Figtree.",
+      "Do provide a forced-colors fallback for any new masked shape (solid CanvasText border, mask dropped)."
+    ],
+    "donts": [
+      "Don't add a shadow to a button, chip, input or badge at rest — shadow is reserved for the paper set-pieces sitting on velvet (card, month-sheet, ticket, toast).",
+      "Don't introduce a gradient, grain, or image standing in for paper or velvet texture — both grounds are flat fills (the lining's two radial gradients are ambient lighting, not material texture).",
+      "Don't use icon fonts or glyph icon sets — icons are hand-drawn single-stroke (1.75) SVG symbols sharing one <svg class=\"sprite\"> sheet.",
+      "Don't flip color-scheme on the page shell to light to \"fix\" a form control — the dark shell plus light-forced form fields is the deliberate way native pickers stay legible against paper."
+    ]
+  }
+}

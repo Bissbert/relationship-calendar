@@ -2,14 +2,11 @@
 
 [← back to the overview](../README.md) · [documentation index](README.md)
 
-This repository is a static browser app. The measurements here cover the local
-smoke run, the shipped-file inventory, and the screenshot provenance. No page
-load benchmark or export-file parser was added.
-
 ## File inventory
 
 `tools/measure.py` uses only the Python standard library. It counts lines and
-bytes for the five runtime files and reads PNG dimensions from their headers.
+bytes for the files the site serves (the same set `tools/build-dist.sh`
+copies) and reads PNG dimensions from their headers.
 
 ```sh
 python3 tools/measure.py
@@ -18,56 +15,62 @@ python3 tools/measure.py
 The command produced:
 
 ```text
-Runtime files: 5
-index.html: 78 lines, 3618 bytes
-js/app.js: 211 lines, 6813 bytes
-js/Blob.js: 684 lines, 20611 bytes
-js/ics.min.js: 2 lines, 3519 bytes
-js/FileSaver.min.js: 2 lines, 2736 bytes
-Runtime total: 977 lines, 37297 bytes
+Runtime files: 13
+index.html: 334 lines, 18258 bytes
+favicon.svg: 1 lines, 221 bytes
+_headers: 10 lines, 559 bytes
+css/app.css: 862 lines, 25444 bytes
+js/dates.js: 154 lines, 5363 bytes
+js/ics.js: 284 lines, 10588 bytes
+js/main.js: 929 lines, 35263 bytes
+js/milestones.js: 36 lines, 1550 bytes
+js/model.js: 171 lines, 5585 bytes
+js/share.js: 120 lines, 4495 bytes
+Code total: 2901 lines, 107326 bytes
+fonts/barlow-condensed-600.woff2: 14844 bytes
+fonts/figtree.woff2: 20184 bytes
+fonts/young-serif.woff2: 18520 bytes
+Font total: 53548 bytes
+Runtime total: 160874 bytes
 PNG media files: 2
-media/relationship-calendar-empty.png: 1280x577 pixels, 44743 bytes
-media/relationship-calendar-example.png: 1280x662 pixels, 50415 bytes
+media/relationship-calendar-example.png: 740x700 pixels, 309395 bytes
+media/relationship-calendar-month.png: 740x700 pixels, 255518 bytes
 ```
 
-## Browser smoke run
-
-The page was served from the repository root with:
+## Tests
 
 ```sh
-python3 -m http.server 8000
+node --test tests/
 ```
-
-A real local browser session opened `http://127.0.0.1:8000/`, captured the empty
-state, entered the fictional event `Example stargazing night`, and captured the
-populated preview. The date used for that sample was the fictional
-`2099-01-01`; it is not personal data. The browser accessibility snapshot showed
-the event in the memory list, and the browser error and console checks returned
-no output during the single-event flow.
-
-The download button was clicked once after the single-event flow and produced no
-reported browser error. The downloaded file itself was not inspected, so this
-pass does not publish a file-content or calendar-validity measurement.
-
-## Recurring-event check
-
-The recurring checkbox and linear controls were exercised with the same
-fictional date. Submission did not append an entry. Capturing the page error
-reported:
 
 ```text
-Uncaught TypeError: Cannot read properties of null (reading 'value')
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
 ```
 
-The source explained the cause: `index.html` names the end-date input
-`recurring-end`, while `js/app.js` asked for `linear-end`. The measurement is
-recorded as it was observed, not silently counted as a passing path. The defect
-has since been fixed on the default branch; see [Bugs found](BUGS-FOUND.md).
+The suite covers date validation, monthly and yearly repeats across short
+months and leap years, legacy migration, merging, milestones, `.ics` export
+(escaping, folding, alarms, timed and all-day events), an `.ics` round trip of
+every field, import of a foreign calendar, share-link and backup round trips,
+and Google Calendar links.
+
+## Browser checks
+
+The page was served with `python3 -m http.server` and exercised in Chrome with
+the fictional couple Robin & Kai: adding a date with markup in the title
+(rendered as text), validation, editing, deleting and undoing, month-view
+keyboard navigation, generating 30 milestones, and a share-link round trip
+(open the link, accept the merge banner, check the fragment is cleared). The console showed no errors. Phone layouts were
+checked at 390 px wide.
 
 ## What was not measured
 
-- GitHub Pages deployment was not inspected or triggered.
-- No timing, bundle-size benchmark, accessibility score, or cross-browser matrix
-  was collected.
-- No animation is shipped: the screenshots are still captures from a real run,
-  not mocked terminal output or generated animation frames.
+- No cross-browser matrix: Safari and Firefox were not tested.
+- The exported `.ics` file was checked by the test suite, not by importing it
+  into Apple Calendar, Google Calendar and Outlook one by one.
+- No load-time benchmark was collected.

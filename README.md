@@ -1,123 +1,114 @@
 # Relationship Calendar
 
-Relationship Calendar is a small browser-only calendar for couples who want to
-collect shared memories and export them as an `.ics` file. It runs as a static
-GitHub Pages site, keeps the working list in the browser's local storage, and
-does not need an account or a server-side API.
+A small calendar for couples. It keeps your anniversaries, birthdays, date
+nights, trips and relationship milestones in one place, shows what comes next
+and how many days you have been together, and hands the dates to the calendar
+apps you already use. There is no account and no server: everything stays in
+your browser until you export or share it.
 
-![Relationship Calendar with a fictional example event](media/relationship-calendar-example.png)
+**Live:** <https://calendar.bissbert.ch>
 
-The screenshot is a real local run with the fictional event title
-`Example stargazing night`.
+![Relationship Calendar list view with fictional example dates](media/relationship-calendar-example.png)
 
-## Quick start
+![Relationship Calendar month view](media/relationship-calendar-month.png)
 
-The app has no build step or package installation:
+The screenshots use the fictional couple Robin & Kai.
+
+## What it does
+
+| Feature | Details |
+|---|---|
+| Upcoming dates | The next date as a large ticket, then every upcoming date grouped by month with "in 12 days" style countdowns. Past dates fold away behind a toggle. |
+| Month view | A keyboard-navigable month grid (arrow keys, Home/End, Page Up/Down, Shift+Page for years). Selecting a day lists its dates and offers to add one there. |
+| Together counter | Enter the day you got together and the header shows "Day N". |
+| Milestones | Generates monthiversaries, day counts (100, 500, 1000 …), numbered anniversaries and optional fun numbers (1111, 1234 …) from your start date, with a preview before adding. |
+| Rich dates | Kind (anniversary, birthday, date night, trip, milestone, other), optional time and duration, place, notes, repeats (weekly, monthly, yearly, with an optional end) and a reminder. |
+| Edit and undo | Every date can be edited. Adding, editing, deleting and clearing all show a toast with **Undo**. |
+| Calendar export | A standards-compliant `.ics` file: all-day or timed events, `RRULE` repeats, `VALARM` reminders and stable UIDs, so importing again updates dates instead of duplicating them. |
+| Google Calendar | Each date has a link that opens it prefilled in Google Calendar. |
+| Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; opening the link offers to merge the dates. |
+| Backup and import | Download a JSON backup and restore it later, or import any `.ics` file from another calendar. |
+
+Dates from the first version of the app (stored under `relationshipEvents`)
+are migrated automatically on first load.
+
+## Run it locally
+
+There is no build step and nothing to install:
 
 ```sh
-cd relationship-calendar
 python3 -m http.server 8000
 ```
 
-Open <http://localhost:8000> in a browser. The static-server command and the
-local page load were verified in this checkout.
+Open <http://localhost:8000>. The page uses ES modules, so it has to be served
+over HTTP; opening `index.html` as a file does not work.
 
-### Deploy to GitHub Pages
+Run the tests with Node 22 or newer (the share-link tests need `CompressionStream("deflate-raw")`):
 
-The repository already contains the site entry point at `index.html`. In the
-repository's GitHub settings, choose **Pages**, select **Deploy from a branch**,
-choose `main` and the `/ (root)` folder, then save. Pages can serve the files
-directly because there is no build command or generated output directory.
-
-## Generation flow
-
-The form stores event entries first. Export expands recurring entries into
-individual calendar events and passes them to the vendored `ics.js` library.
-
-```mermaid
-flowchart LR
-    I["Form input<br/>date, title, recurrence"] --> S["events[]<br/>in memory"]
-    S --> L["localStorage<br/>relationshipEvents"]
-    S --> P["Memory list<br/>preview"]
-    S --> X["Expand recurrence<br/>into event instances"]
-    X --> C["ics.js<br/>build VCALENDAR"]
-    C --> D["FileSaver<br/>download .ics"]
-
-    style X fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style D fill:#238636,stroke:#3fb950,color:#fff
+```sh
+node --test tests/
 ```
+
+## Deploy
+
+The site is hosted on Cloudflare Pages as a direct upload. `tools/build-dist.sh`
+copies only the served files into `dist/`, which keeps the README, docs, tests
+and tooling off the public site:
+
+```sh
+tools/build-dist.sh
+wrangler pages deploy dist --project-name relationship-calendar --branch main
+```
+
+`_headers` sets a strict Content Security Policy (scripts, styles and fonts
+from the same origin only, no inline code), HSTS and the usual hardening
+headers. The custom domain is attached to the Pages project in the Cloudflare
+dashboard.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-    H["index.html<br/>form and layout"] --> A["js/app.js<br/>state and handlers"]
-    H --> T["Tailwind CSS CDN<br/>utility classes"]
-    A --> LS["Browser localStorage"]
-    A --> I["js/ics.min.js<br/>iCalendar builder"]
-    A --> F["js/FileSaver.min.js<br/>download helper"]
-    F --> B["js/Blob.js<br/>Blob fallback"]
-    I --> O["Relationship_Calendar.ics"]
-
-    style A fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style O fill:#238636,stroke:#3fb950,color:#fff
+    H["index.html<br/>markup and templates"] --> M["js/main.js<br/>rendering, forms, views"]
+    H --> C["css/app.css<br/>tokens, tickets, layout"]
+    M --> MO["js/model.js<br/>validation, storage, merge"]
+    M --> D["js/dates.js<br/>date math, repeats"]
+    M --> MS["js/milestones.js<br/>milestone generator"]
+    M --> I["js/ics.js<br/>.ics export and import"]
+    M --> S["js/share.js<br/>share links, backups,<br/>Google links"]
+    MO --> LS["localStorage<br/>relationship-calendar:v2"]
 ```
 
-## Capabilities
+Dates are plain `YYYY-MM-DD` strings and all arithmetic runs on UTC midnights,
+so no time zone can move an anniversary by a day. The DOM is built with
+`createElement` and `textContent` only; nothing user-supplied goes through
+`innerHTML`.
 
-| Capability | Current behavior | Main source |
-|---|---|---|
-| Single memories | Adds one event entry to the preview list. | `index.html`, `js/app.js` |
-| Linear recurrence | Offers weekly, monthly, or yearly intervals and an end date. | `index.html`, `js/app.js` |
-| Exponential recurrence | Expands through the built-in weekly, monthly, and yearly stages. | `js/app.js` |
-| Local persistence | Saves the event list under `relationshipEvents` in local storage. | `js/app.js` |
-| Calendar export | Builds iCalendar events and downloads `Relationship_Calendar.ics`. | `js/app.js`, `js/ics.min.js` |
-| Static hosting | Loads from the repository root with no build tool. | `index.html` |
-
-## Measured results
-
-| Check | Result | How it was obtained |
-|---|---:|---|
-| Local static page load | passed | `python3 -m http.server 8000` and a real browser session |
-| Fictional single-event add flow | passed | The event appeared in the rendered memory list |
-| Browser errors during the verified single-event flow | none observed | Browser `errors` and `console` checks |
-| Runtime files | 5 | `python3 tools/measure.py` |
-| Runtime inventory | 977 lines, 37,297 bytes | `python3 tools/measure.py` |
-| Example screenshot | 1,280 × 662 pixels, 50,415 bytes | `python3 tools/measure.py` |
-
-The measurement procedure and the unverified paths are recorded in
-[`docs/measurement.md`](docs/measurement.md).
+More detail is in [`docs/`](docs/README.md).
 
 ## Repository layout
 
 ```text
-index.html       static page, form, and layout
-js/app.js        event state, recurrence, preview, and export wiring
-js/ics.min.js    vendored iCalendar builder
-js/FileSaver.min.js  vendored browser download helper
-js/Blob.js       vendored Blob compatibility helper
-tools/           standard-library measurement script
-media/           screenshots captured from a real local browser run
-docs/            subsystem write-ups and measurement provenance
+index.html      page markup and the SVG icon sprite
+css/app.css     design tokens and all styles
+js/             ES modules (see the architecture diagram)
+fonts/          self-hosted Young Serif, Figtree, Barlow Condensed + OFL licenses
+_headers        Cloudflare Pages security headers
+tests/          node:test suite for dates, model, milestones, .ics and sharing
+tools/          dist build script and measurement script
+media/          screenshots from a real local run
+docs/           subsystem write-ups
+PRODUCT.md      product context used for design work
+DESIGN.md       the visual system
 ```
 
-## Known limitations
+## Limits
 
-- The preview shows the title and recurrence label, not the date or the
-  expanded instances. Inspect the downloaded calendar to see the generated
-  dates.
-- `localStorage` is browser- and origin-specific. Clearing site data or using
-  another browser removes the visible working list from that browser.
-- The page loads Tailwind CSS from jsDelivr, so the initial styling depends on
-  network access to that CDN.
-- The Pages setting itself was not inspected in this pass. The deployment
-  instructions describe the repository's static root, not a measured Pages
-  deployment.
-
-Three defects recorded during this pass have since been fixed on the default
-branch: recurring linear events could not be submitted because `js/app.js` read
-a `linear-end` input the markup does not contain, the toast calls had no toast
-elements to write into, and `index.html` closed a `</div>` early between the
-action buttons. The handler now reads `recurring-end`, `index.html` carries
-accessible toast elements and emits one notification per user action, and the
-stray closing tag is gone. See [`docs/BUGS-FOUND.md`](docs/BUGS-FOUND.md).
+- Data lives in one browser. Use the share link or a backup to move it to
+  another device; there is no automatic sync.
+- A share link with many long notes can grow past 8,000 characters, which some
+  messengers truncate. The app warns when that happens and suggests a backup
+  file instead.
+- `.ics` import keeps weekly, monthly and yearly repeats. More complex rules
+  (every other week, specific weekdays) are imported as single dates, and the
+  app says how many were simplified.
