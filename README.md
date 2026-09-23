@@ -18,7 +18,7 @@ The screenshots use the fictional couple Robin & Kai.
 
 | Feature | Details |
 |---|---|
-| First-run setup | A new calendar starts with three short steps: your names, the day you got together, and the dates you already know (anniversary, birthdays, first date, Valentine's Day …). Skippable, and skipped automatically when you arrive from a share link. |
+| First-run setup | A new calendar starts with three short steps: your names, the day you got together, and the dates you already know (anniversary, birthdays, first date, Valentine's Day …), plus tick boxes for common milestones: 1 month, 3 months, 100 days, 6 months, 500 days and 1,000 days. Skippable, and skipped automatically when you arrive from a share link. |
 | Upcoming dates | The next date as a large ticket, then every upcoming date grouped by month with "in 12 days" style countdowns. Past dates fold away behind a toggle. |
 | Month view | A keyboard-navigable month grid (arrow keys, Home/End, Page Up/Down, Shift+Page for years). Selecting a day lists its dates and offers to add one there. |
 | Together counter | Enter the day you got together and the header shows "Day N". |

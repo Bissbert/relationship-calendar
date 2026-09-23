@@ -8,7 +8,7 @@ import { milestones } from '../js/milestones.js';
 import { toICS, fromICS, fold, escapeText, reminderTrigger, parseDuration } from '../js/ics.js';
 import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup } from '../js/share.js';
 import { presets, availablePresets } from '../js/presets.js';
-import { shouldWelcome, welcomeChoices, welcomeEvents } from '../js/welcome.js';
+import { shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from '../js/welcome.js';
 
 const ev = (fields) => normalizeEvent({ title: 'Test', date: '2026-01-31', ...fields });
 
@@ -230,4 +230,24 @@ test('first-run setup turns ticks and filled days into dates', () => {
     ['Our anniversary', '2019-06-01', 'yearly'],
     ['Jess’ birthday', '1994-03-02', 'yearly'],
   ]);
+});
+
+test('first-run setup offers the common milestones, upcoming ones ticked', () => {
+  assert.deepEqual(welcomeMilestones('', '2026-09-23'), []);
+  const marks = welcomeMilestones('2026-05-01', '2026-09-23');
+  assert.deepEqual(marks.map((m) => [m.title, m.date, m.checked]), [
+    ['1 month together', '2026-06-01', false],
+    ['3 months together', '2026-08-01', false],
+    ['100 days together', '2026-08-08', false],
+    ['6 months together', '2026-11-01', true],
+    ['500 days together', '2027-09-12', true],
+    ['1,000 days together', '2029-01-24', true],
+  ]);
+  const settings = { names: ['', ''], since: '2026-05-01' };
+  const events = welcomeEvents(settings, '2026-09-23', new Set([marks[3].key, marks[0].key]), {});
+  assert.deepEqual(events.map((e) => [e.title, e.category, e.reminder]), [
+    ['1 month together', 'milestone', '1d'],
+    ['6 months together', 'milestone', '1d'],
+  ]);
+  assert.equal(events[0].group, events[1].group);
 });

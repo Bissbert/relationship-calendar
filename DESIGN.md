@@ -249,7 +249,7 @@ Every ticket, the Next up hero included, ends with a labelled strip under a dash
 The paper toast at the bottom carries the Undo for every change. It stays 12 seconds when it has an Undo (5 otherwise) and pauses while hovered or focused, resuming with at least 3 seconds left, so Undo never slips away mid-reach.
 
 ### First-run setup
-A brand-new calendar (no dates, no names, no start date) that was not opened from a share link shows a three-step paper card in place of the empty board: names (filling the velvet heading live), the day you got together, then the dates you already know (checkbox rows for picks with a known day, optional date fields for birthdays, first date and moving in). Step titles are serif display, progress reads "Step 2 of 3" beside the buttons, and "Skip setup" is a plain underlined text button. Finishing adds everything in one undoable change; a `relationship-calendar:welcomed` flag keeps it from coming back.
+A brand-new calendar (no dates, no names, no start date) that was not opened from a share link shows a three-step paper card in place of the empty board: names (filling the velvet heading live), the day you got together, then the dates you already know (checkbox rows for picks with a known day; a "Milestones together" group with 1 month, 3 months, 100 days, 6 months, 500 days and 1,000 days, upcoming ones ticked and passed ones marked "Already passed"; optional date fields for birthdays, first date and moving in). Step titles are serif display, progress reads "Step 2 of 3" beside the buttons, and "Skip setup" is a plain underlined text button. Finishing adds everything in one undoable change; a `relationship-calendar:welcomed` flag keeps it from coming back.
 
 ## Do's and Don'ts
 

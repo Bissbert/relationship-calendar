@@ -691,6 +691,9 @@ code {
 .welcome-title:focus { outline: none; }
 .welcome-text { margin: -0.25rem 0 0; color: var(--ink-soft); max-width: 34rem; }
 .welcome-since { max-width: 16rem; }
+.welcome-group { gap: 0.6rem; padding-top: 1rem; border-top: 1px dashed var(--paper-line); }
+.welcome-group .field-label { float: left; width: 100%; }
+.welcome-group .checks { grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); }
 .welcome-fields { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); padding-top: 1rem; border-top: 1px dashed var(--paper-line); }
 .welcome-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--paper-line); }
 .welcome-progress { margin-left: auto; font-size: 0.875rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
