@@ -12,7 +12,7 @@
   <div class="w-full max-w-3xl bg-white rounded-2xl shadow-md p-6">
     <h1 class="text-3xl font-bold text-center mb-4 text-[#a69eb0]">💘 Relationship Calendar</h1>
 
-    <section class="mb-6">
+    <section class="mb-8">
       <h2 class="text-xl font-semibold mb-2">Add a New Memory</h2>
       <form id="event-form" class="space-y-4">
         <div>
@@ -64,11 +64,13 @@
 
     <section class="flex flex-col gap-2">
       <button id="clear-btn" class="mb-2 bg-red-100 hover:bg-red-200 text-red-600 font-semibold py-2 px-4 rounded-xl w-full">🗑️ Clear All Events</button>
-      </div>
 <button id="download-btn" class="bg-[#f2e2cd] hover:bg-[#dadae3] text-black font-semibold py-2 px-4 rounded-xl w-full">
         📥 Download .ics Calendar
       </button>
     </section>
+  </div>
+  <div id="toast" class="hidden fixed bottom-4 right-4 rounded-xl bg-gray-900 px-4 py-2 text-white shadow-lg" role="status" aria-live="polite" aria-atomic="true">
+    <span id="toast-message"></span>
   </div>
 
 <script src="js/Blob.js"></script>
