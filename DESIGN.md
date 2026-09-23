@@ -227,7 +227,7 @@ The signature silhouette is the ticket: a CSS `mask` built from two radial-gradi
 - **Internal Padding:** 1.25rem.
 
 ### Inputs / Fields
-- **Style:** 9px radius, 1px `#c9b59c` border, a dedicated cream fill (`#fffaf3`) lighter than the surrounding paper — and, notably, `color-scheme: light` forced on every field even though the page shell is `color-scheme: dark`, so native date/time pickers render light and match the paper aesthetic instead of the velvet one.
+- **Style:** 9px radius, 1px `#c9b59c` border, a dedicated cream fill (`#fffaf3`) lighter than the surrounding paper — and, notably, `color-scheme: light` forced on every field even though the page shell is `color-scheme: dark`, so native date/time pickers render light and match the paper aesthetic instead of the velvet one. The paper surfaces themselves (card, month sheet, ticket, preview, toast) are also `color-scheme: light`, so checkboxes, radios and scrollbars on paper never pick up the dark native style.
 - **Focus:** border shifts to Stamp Ink plus a 3px `rgb(59 58 151 / 0.25)` ring, `outline: none` — the ring replaces the outline rather than stacking with it.
 - **Error / Disabled:** `[aria-invalid="true"]` forces the border to Danger red; `field-error` text is Danger-colored and collapses to nothing when empty (`:empty { display: none }`).
 
@@ -250,4 +250,4 @@ A two-column grid — a narrow "stub" column (variable width via `--stub`) holdi
 - **Don't** add a shadow to a button, chip, input or badge at rest — shadow is reserved for the paper set-pieces sitting on velvet (card, month-sheet, ticket, toast).
 - **Don't** introduce a gradient, grain, or image standing in for paper or velvet texture — both grounds are flat fills (the lining's two radial gradients are ambient lighting, not material texture).
 - **Don't** use icon fonts or glyph icon sets — icons are hand-drawn single-stroke (1.75) SVG symbols sharing one `<svg class="sprite">` sheet.
-- **Don't** flip `color-scheme` on the page shell to light to "fix" a form control — the dark shell plus light-forced form fields is the deliberate way native pickers stay legible against paper.
+- **Don't** flip `color-scheme` on the page shell to light to "fix" a form control — the dark shell plus light-forced form fields and paper surfaces is the deliberate way native controls stay legible against paper.

@@ -64,6 +64,10 @@
   accent-color: var(--stamp);
 }
 
+/* Paper surfaces are light, so every native control on them (checkboxes,
+   radios, scrollbars, pickers) must render light too, whatever the OS theme. */
+.skip, .ticket, .month-sheet, .card, .preview, .toast { color-scheme: light; }
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
