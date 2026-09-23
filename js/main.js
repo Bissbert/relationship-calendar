@@ -7,6 +7,7 @@ import {
 } from './dates.js';
 import { CATEGORIES, REPEATS, REMINDERS, newId, normalizeEvent, load, save, sortEvents, merge } from './model.js';
 import { MILESTONE_SETS, milestones } from './milestones.js';
+import { availablePresets } from './presets.js';
 import { toICS, fromICS } from './ics.js';
 import { shareLink, readShareLink, toBackup, fromBackup, googleCalendarLink, download } from './share.js';
 
@@ -473,6 +474,7 @@ function render() {
   if (ui.view === 'list') renderList(groups, now);
   else renderMonth(now);
   renderTakeaway();
+  renderQuickPicks(now);
   if (!$('milestone-form').hidden) renderMilestonePreview();
   ui.fresh.clear();
 }
@@ -635,6 +637,38 @@ function setSubmitMode(editing) {
   $('submit-btn').querySelector('use').setAttribute('href', editing ? '#i-check' : '#i-plus');
   $('cancel-edit').hidden = !editing;
   document.querySelector('.composer .card').classList.toggle('is-editing', editing);
+  renderQuickPicks();
+}
+
+// Quick picks fill the form with a common date and its usual rules. Once a
+// date with the same name exists, its pick goes away.
+function renderQuickPicks(now = today()) {
+  const picks = ui.editingId ? [] : availablePresets(state.settings, state.events, now);
+  $('quick-picks').hidden = !picks.length;
+  $('f-quick').replaceChildren(...picks.map((p) => el('button', {
+    type: 'button',
+    class: 'quick-option',
+    on: { click: () => applyPreset(p) },
+  }, [el('span', {}, [icon(CATEGORIES[p.category].icon), p.label])])));
+}
+
+function applyPreset(p) {
+  resetForm();
+  $('f-title').value = p.title;
+  $('f-date').value = p.date;
+  $('f-time').value = p.time;
+  $('f-duration').value = String(p.duration);
+  document.querySelector(`#f-kinds input[value="${p.category}"]`).checked = true;
+  $('f-repeat').value = p.repeat;
+  $('f-reminder').value = p.reminder;
+  syncConditionalFields();
+
+  const rule = `${REPEATS[p.repeat].toLowerCase()}, reminder ${REMINDERS[p.reminder].toLowerCase()}`;
+  let hint = `Filled in: ${rule}. Change anything, then press Add date.`;
+  if (!p.date) hint = `Filled in: ${rule}. Pick the day, then press Add date.`;
+  if (p.title === 'Birthday') hint = `Filled in: ${rule}. Add whose birthday it is and pick the day.`;
+  $('quick-hint').textContent = hint;
+  (p.title === 'Birthday' ? $('f-title') : p.date ? $('submit-btn') : $('f-date')).focus();
 }
 
 function resetForm() {
@@ -642,6 +676,7 @@ function resetForm() {
   $('event-form').reset();
   for (const id of ['f-title', 'f-date', 'f-until']) setError(id, '');
   $('more-details').open = false;
+  $('quick-hint').textContent = '';
   setSubmitMode(false);
   syncConditionalFields();
 }

@@ -7,6 +7,7 @@ import { normalizeEvent, migrateLegacy, merge } from '../js/model.js';
 import { milestones } from '../js/milestones.js';
 import { toICS, fromICS, fold, escapeText, reminderTrigger, parseDuration } from '../js/ics.js';
 import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup } from '../js/share.js';
+import { presets, availablePresets } from '../js/presets.js';
 
 const ev = (fields) => normalizeEvent({ title: 'Test', date: '2026-01-31', ...fields });
 
@@ -184,4 +185,27 @@ test('google calendar link', () => {
   const link = new URL(googleCalendarLink(ev({ time: '23:00', duration: 120, repeat: 'yearly' })));
   assert.equal(link.searchParams.get('dates'), '20260131T230000/20260201T010000');
   assert.equal(link.searchParams.get('recur'), 'RRULE:FREQ=YEARLY');
+});
+
+test('quick picks use names, start date and the next matching day', () => {
+  const list = presets({ names: ['Robin', 'Jess'], since: '2019-06-01' }, '2026-09-23');
+  const by = Object.fromEntries(list.map((p) => [p.key, p]));
+  assert.equal(by['birthday-0'].title, 'Robin’s birthday');
+  assert.equal(by['birthday-1'].title, 'Jess’ birthday');
+  assert.equal(by.anniversary.date, '2019-06-01');
+  assert.equal(by.anniversary.repeat, 'yearly');
+  assert.equal(by['date-night'].date, '2026-09-25');
+  assert.equal(by['date-night'].repeat, 'weekly');
+  assert.equal(by['date-night'].time, '19:00');
+  assert.equal(by.valentines.date, '2027-02-14');
+  assert.equal(presets({ names: ['', ''], since: '' }, '2026-02-14').find((p) => p.key === 'valentines').date, '2026-02-14');
+  assert.deepEqual(presets({ names: ['', ''], since: '' }, '2026-09-23').filter((p) => p.category === 'birthday').map((p) => p.title), ['Birthday']);
+});
+
+test('quick picks hide once a date with that name exists', () => {
+  const settings = { names: ['Robin', 'Jess'], since: '' };
+  const keys = availablePresets(settings, [ev({ title: ' our anniversary ' }), ev({ title: 'Date night' })], '2026-09-23').map((p) => p.key);
+  assert.ok(!keys.includes('anniversary'));
+  assert.ok(!keys.includes('date-night'));
+  assert.ok(keys.includes('valentines'));
 });

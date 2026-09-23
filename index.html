@@ -162,6 +162,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
 
       <form id="event-form" class="form" role="tabpanel" aria-labelledby="tab-single" novalidate>
+        <div class="field quick-picks" id="quick-picks" role="group" aria-labelledby="quick-label">
+          <span class="field-label" id="quick-label">Quick picks</span>
+          <div class="kind-options" id="f-quick"></div>
+          <p class="field-hint" id="quick-hint" aria-live="polite"></p>
+        </div>
+
         <label class="field">
           <span class="field-label">What</span>
           <input type="text" id="f-title" name="title" maxlength="120" required placeholder="e.g. Our first date" autocomplete="off" aria-describedby="f-title-error">
