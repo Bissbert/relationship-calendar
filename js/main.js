@@ -8,7 +8,7 @@ import {
 import { CATEGORIES, REPEATS, REMINDERS, newId, normalizeEvent, load, save, sortEvents, merge } from './model.js';
 import { MILESTONE_SETS, milestones } from './milestones.js';
 import { availablePresets } from './presets.js';
-import { WELCOMED_KEY, shouldWelcome, welcomeChoices, welcomeEvents } from './welcome.js';
+import { WELCOMED_KEY, shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from './welcome.js';
 import { toICS, fromICS } from './ics.js';
 import { shareLink, readShareLink, toBackup, fromBackup, googleCalendarLink, download } from './share.js';
 
@@ -1021,6 +1021,15 @@ function buildWelcomeDates() {
     el('input', { type: 'checkbox', name: p.key, checked: p.checked }),
     el('span', {}, [p.label, el('small', { text: `${rule(p)} · first on ${formatDate(p.date)}` })]),
   ])));
+  const now = today();
+  const marks = welcomeMilestones(state.settings.since, now);
+  $('w-ms-hint').textContent = marks.length
+    ? 'Counted from the day you got together, with a reminder the day before.'
+    : 'Go back and add the day you got together to pick milestones like 1 month and 6 months.';
+  $('w-ms').replaceChildren(...marks.map((m) => el('label', { class: 'check' }, [
+    el('input', { type: 'checkbox', name: m.key, checked: m.checked }),
+    el('span', {}, [m.title, el('small', { text: `${m.past ? 'Already passed' : relative(m.date, now)} · ${formatDate(m.date)}` })]),
+  ])));
   $('w-fields').replaceChildren(...fields.map((p) => el('label', { class: 'field' }, [
     el('span', { class: 'field-label' }, [p.title, ' ', el('span', { class: 'optional', text: '(optional)' })]),
     el('input', { type: 'date', name: p.key }),
@@ -1037,7 +1046,7 @@ function syncWelcomeSettings() {
 }
 
 function finishWelcome() {
-  const ticked = new Set([...$('w-ticks').querySelectorAll('input:checked')].map((i) => i.name));
+  const ticked = new Set([...$('welcome-form').querySelectorAll('.check input:checked')].map((i) => i.name));
   const dates = Object.fromEntries([...$('w-fields').querySelectorAll('input')].map((i) => [i.name, i.value]));
   const added = welcomeEvents(state.settings, today(), ticked, dates);
   rememberWelcomed();
