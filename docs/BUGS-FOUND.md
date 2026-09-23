@@ -2,9 +2,19 @@
 
 [← back to the overview](../README.md) · [documentation index](README.md)
 
-This ledger records defects found while documenting the current application.
-The proposed diffs are deliberately not applied; the application behavior
-described here is the behavior shipped by the repository.
+This ledger records defects found while documenting the application as it
+stood. The proposed diffs were deliberately not applied during the
+documentation pass itself.
+
+> **Since this pass:** an independent adjudication confirmed all three entries,
+> and a subsequent fix pass applied all three to the default branch: BUG-001 in
+> commit `7cca216`, BUG-002 in commit `bff2aaf` and BUG-003 in commit `e35516f`.
+> The linear branch now reads the `recurring-end` input, `index.html` carries
+> the toast elements the feedback calls need — with one accurate notification
+> per user action, and none when stored events are loaded — and the premature
+> closing `</div>` between the action buttons is removed. Read the
+> reproductions and diffs below as the state at the time of the pass, not as
+> the current state of the default branch.
 
 | ID | Location | Observed behavior |
 |---|---|---|

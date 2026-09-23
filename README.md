@@ -103,18 +103,9 @@ docs/            subsystem write-ups and measurement provenance
 
 ## Known limitations
 
-- Recurring linear events currently do not submit: the markup uses
-  `recurring-end`, while `js/app.js` reads `linear-end`. The browser raises a
-  null-value error when that path is submitted. This pass documents the issue
-  but does not change application behavior.
 - The preview shows the title and recurrence label, not the date or the
   expanded instances. Inspect the downloaded calendar to see the generated
   dates.
-- The JavaScript contains toast calls, but the HTML has no toast elements, so
-  those feedback messages are not displayed.
-- `index.html:67` contains an unmatched closing `</div>` between the action
-  buttons. The browser recovers during parsing, but the source markup is
-  malformed.
 - `localStorage` is browser- and origin-specific. Clearing site data or using
   another browser removes the visible working list from that browser.
 - The page loads Tailwind CSS from jsDelivr, so the initial styling depends on
@@ -122,3 +113,11 @@ docs/            subsystem write-ups and measurement provenance
 - The Pages setting itself was not inspected in this pass. The deployment
   instructions describe the repository's static root, not a measured Pages
   deployment.
+
+Three defects recorded during this pass have since been fixed on the default
+branch: recurring linear events could not be submitted because `js/app.js` read
+a `linear-end` input the markup does not contain, the toast calls had no toast
+elements to write into, and `index.html` closed a `</div>` early between the
+action buttons. The handler now reads `recurring-end`, `index.html` carries
+accessible toast elements and emits one notification per user action, and the
+stray closing tag is gone. See [`docs/BUGS-FOUND.md`](docs/BUGS-FOUND.md).

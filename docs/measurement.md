@@ -59,9 +59,10 @@ reported:
 Uncaught TypeError: Cannot read properties of null (reading 'value')
 ```
 
-The source explains the cause: `index.html` names the end-date input
-`recurring-end`, while `js/app.js` asks for `linear-end`. This is recorded as a
-known limitation, not silently counted as a passing path.
+The source explained the cause: `index.html` names the end-date input
+`recurring-end`, while `js/app.js` asked for `linear-end`. The measurement is
+recorded as it was observed, not silently counted as a passing path. The defect
+has since been fixed on the default branch; see [Bugs found](BUGS-FOUND.md).
 
 ## What was not measured
 

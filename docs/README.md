@@ -12,4 +12,4 @@ numbers and screenshots in the overview.
 | [Event model](event-model.md) | In-memory entries, local storage, preview, and recurrence expansion. |
 | [Calendar export](calendar-export.md) | iCalendar construction and browser download flow. |
 | [Measurement](measurement.md) | What was run, what was captured, and what remains unverified. |
-| [Bugs found](BUGS-FOUND.md) | Reproduced defects, locations, and unapplied fix diffs. |
+| [Bugs found](BUGS-FOUND.md) | Reproduced defects, locations, and the diffs since applied. |
