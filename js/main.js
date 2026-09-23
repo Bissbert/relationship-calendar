@@ -5,7 +5,7 @@ import {
   weekday, occurrences, nextOccurrence, monthShort, monthLong, weekdayShort,
   formatDate, formatLong, relative, ordinal,
 } from './dates.js';
-import { CATEGORIES, REPEATS, REMINDERS, newId, normalizeEvent, load, save, sortEvents, merge } from './model.js';
+import { CATEGORIES, REPEATS, REMINDERS, newId, normalizeEvent, load, save, sortEvents, merge, coupleName as coupleNameOf, calendarName } from './model.js';
 import { MILESTONE_SETS, milestones } from './milestones.js';
 import { availablePresets } from './presets.js';
 import { WELCOMED_KEY, shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from './welcome.js';
@@ -83,11 +83,7 @@ function change(message, mutate) {
   });
 }
 
-function coupleName() {
-  const [a, b] = state.settings.names;
-  if (a && b) return `${a} & ${b}`;
-  return a || b || '';
-}
+const coupleName = () => coupleNameOf(state.settings);
 
 function formatTime(event) {
   if (!event.time) return '';
@@ -883,8 +879,7 @@ $('milestone-form').addEventListener('submit', (e) => {
 // ------------------------------------------------------------ take away
 
 function calendarFile() {
-  const name = coupleName() ? `${coupleName()} · Relationship Calendar` : 'Relationship Calendar';
-  return toICS(state.events, { name });
+  return toICS(state.events, { name: calendarName(state.settings) });
 }
 
 $('export-btn').addEventListener('click', () => {
@@ -904,7 +899,7 @@ if (onPhone) {
 
 $('device-cal-btn').addEventListener('click', async () => {
   if (!state.events.length) return;
-  const route = await addToDeviceCalendar('relationship-calendar.ics', calendarFile());
+  const route = await addToDeviceCalendar({ filename: 'relationship-calendar.ics', text: calendarFile(), events: state.events, settings: state.settings });
   if (route === 'download') toast(`Downloaded ${plural(state.events.length, 'date')}. Tap the file in your downloads to open it in your calendar.`);
 });
 

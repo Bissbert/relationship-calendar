@@ -3,8 +3,10 @@
 A small calendar for couples. It keeps your anniversaries, birthdays, date
 nights, trips and relationship milestones in one place, shows what comes next
 and how many days you have been together, and hands the dates to the calendar
-apps you already use. There is no account and no server: everything stays in
-your browser until you export or share it.
+apps you already use. There is no account and no database: everything stays in
+your browser until you export or share it. The one exception is "Add to my
+calendar" on iPhone, which sends the dates through the site's own
+`/calendar.ics` function and straight back (see below).
 
 **Live:** <https://calendar.bissbert.ch>
 
@@ -27,7 +29,7 @@ The screenshots use the fictional couple Robin & Kai.
 | Rich dates | Kind (anniversary, birthday, date night, trip, milestone, other), optional time and duration, place, notes, repeats (weekly, monthly, yearly, with an optional end) and a reminder. |
 | Edit, delete and undo | Every ticket has labelled Edit and Delete buttons, and the edit form has "Delete this date". "Start over" removes all dates after an in-place confirmation that names the count. Every change shows a toast with **Undo** that waits while you point at it. |
 | Calendar export | A standards-compliant `.ics` file: all-day or timed events, `RRULE` repeats, `VALARM` reminders and stable UIDs, so importing again updates dates instead of duplicating them. |
-| Add to my calendar | On phones, one button hands the `.ics` file to the device calendar: iOS opens its "Add All" calendar sheet, Android opens the share sheet to pick a calendar app, and anything else falls back to a download. The calendar app always asks before adding. |
+| Add to my calendar | On phones, one button hands the `.ics` file to the device calendar: iOS opens its "Add All" calendar sheet (the dates go to `/calendar.ics`, a Pages Function that rebuilds the file and stores nothing, because iOS won't open calendar files from `data:` or `blob:` URLs), Android opens the share sheet to pick a calendar app, and anything else falls back to a download. The calendar app always asks before adding. |
 | Google Calendar | Each date has a link that opens it prefilled in Google Calendar. |
 | Share with your partner | A link that carries your dates in the URL fragment. The fragment never reaches the server; an empty calendar loads the dates straight away; otherwise a dialog offers to add them next to yours or replace yours, with Undo either way. |
 | Backup and import | Download a JSON backup and restore it later, or import any `.ics` file from another calendar. |
@@ -44,7 +46,9 @@ python3 -m http.server 8000
 ```
 
 Open <http://localhost:8000>. The page uses ES modules, so it has to be served
-over HTTP; opening `index.html` as a file does not work.
+over HTTP; opening `index.html` as a file does not work. The static server
+doesn't run `functions/`; to try `/calendar.ics`, build and run
+`wrangler pages dev dist` instead.
 
 Run the tests with Node 22 or newer (the share-link tests need `CompressionStream("deflate-raw")`):
 
@@ -56,7 +60,8 @@ node --test tests/
 
 The site is hosted on Cloudflare Pages as a direct upload. `tools/build-dist.sh`
 copies only the served files into `dist/`, which keeps the README, docs, tests
-and tooling off the public site:
+and tooling off the public site. Run the deploy from the repo root so wrangler
+also picks up `functions/`:
 
 ```sh
 tools/build-dist.sh

@@ -46,21 +46,18 @@ function unpack(data) {
   return { events, settings: normalizeSettings(data.s) };
 }
 
-export async function shareLink(events, settings, base = location.href) {
+// 'z' marks a deflated payload, 'j' plain JSON for browsers without
+// CompressionStream.
+async function encodePayload(events, settings) {
   const json = new TextEncoder().encode(JSON.stringify(pack(events, settings)));
-  let payload;
   if (typeof CompressionStream === 'function') {
-    payload = `z${toBase64Url(await pipe(json, new CompressionStream('deflate-raw')))}`;
-  } else {
-    payload = `j${toBase64Url(json)}`;
+    return `z${toBase64Url(await pipe(json, new CompressionStream('deflate-raw')))}`;
   }
-  const url = new URL(base);
-  url.hash = `${SHARE_PARAM}=${payload}`;
-  return url.toString();
+  return `j${toBase64Url(json)}`;
 }
 
-export async function readShareLink(hash = location.hash) {
-  const match = new RegExp(`^#${SHARE_PARAM}=([zj])([\\w-]+)$`).exec(hash);
+async function decodePayload(payload) {
+  const match = /^([zj])([\w-]+)$/.exec(payload || '');
   if (!match) return null;
   try {
     let bytes = fromBase64Url(match[2]);
@@ -69,6 +66,35 @@ export async function readShareLink(hash = location.hash) {
   } catch {
     return null;
   }
+}
+
+export async function shareLink(events, settings, base = location.href) {
+  const url = new URL(base);
+  url.hash = `${SHARE_PARAM}=${await encodePayload(events, settings)}`;
+  return url.toString();
+}
+
+export async function readShareLink(hash = location.hash) {
+  const prefix = `#${SHARE_PARAM}=`;
+  return String(hash).startsWith(prefix) ? decodePayload(String(hash).slice(prefix.length)) : null;
+}
+
+// iOS only offers its "Add All" calendar sheet for a .ics file that arrives
+// over https, so the calendar button sends the dates to the site's own
+// /calendar.ics function, which turns them straight back into a file and
+// keeps nothing. The dates travel in the query string, so this is the one
+// place they reach the server. Returns '' when the URL would be too long.
+export const CALENDAR_PATH = '/calendar.ics';
+const MAX_CALENDAR_URL = 15000;
+
+export async function calendarFileUrl(events, settings, base = location.href) {
+  const url = new URL(CALENDAR_PATH, base);
+  url.search = new URLSearchParams({ d: await encodePayload(events, settings) });
+  return url.href.length <= MAX_CALENDAR_URL ? url.href : '';
+}
+
+export async function readCalendarFileUrl(url) {
+  return decodePayload(new URL(url).searchParams.get('d'));
 }
 
 export function toBackup(events, settings) {
@@ -122,8 +148,9 @@ export function download(filename, text, type) {
 // How a phone hands a calendar file to its own calendar app. No web API can
 // write to the device calendar, so each route ends in a sheet the person
 // confirms:
-// - 'open': iOS shows its "Add All" calendar sheet when Safari opens a
-//   text/calendar file directly (a download would only land in Files).
+// - 'open': iOS shows its "Add All" calendar sheet when the browser opens a
+//   text/calendar file from an https URL. It refuses data: and blob: URLs,
+//   and a download would only land in Files.
 // - 'share': the share sheet, where the person picks their calendar app.
 // - 'download': the file lands in Downloads; tapping it opens the calendar.
 // iPadOS reports itself as a Mac, so touch points tell the two apart.
@@ -134,15 +161,19 @@ export function deviceCalendarRoute({ userAgent = '', maxTouchPoints = 0, canSha
 }
 
 // Returns the route taken, or '' when the person closed the share sheet.
-export async function addToDeviceCalendar(filename, text) {
+export async function addToDeviceCalendar({ filename, text, events, settings }) {
   const file = new File([text], filename, { type: 'text/calendar' });
   let canShareFiles = false;
   try { canShareFiles = Boolean(navigator.canShare?.({ files: [file] })); } catch { /* unsupported */ }
   const route = deviceCalendarRoute({ userAgent: navigator.userAgent, maxTouchPoints: navigator.maxTouchPoints, canShareFiles });
 
   if (route === 'open') {
-    location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(text)}`;
-    return route;
+    const url = await calendarFileUrl(events, settings);
+    if (url) {
+      location.href = url;
+      return route;
+    }
+    // Too many dates for one URL: the download still gets them into Files.
   }
   if (route === 'share') {
     try {
