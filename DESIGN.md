@@ -213,10 +213,10 @@ The signature silhouette is the ticket: a CSS `mask` built from two radial-gradi
 ### Buttons
 - **Shape:** fully round (999px), minimum 2.75rem tall (44px, meeting the 44px touch-target commitment in PRODUCT.md); `btn-small` steps down to 2.25rem for inline/secondary contexts.
 - **Primary** (`.btn-primary`): Stamp Ink fill, white text — used inside paper contexts (form submits: "Add date," "Add milestones").
-- **Rose** (`.btn-rose`): Rose fill, ink text — the primary call-to-action wherever the surrounding ground is velvet ("Copy share link," "Download calendar file").
+- **Rose** (`.btn-rose`): Rose fill, ink text — the primary call-to-action wherever the surrounding ground is velvet ("Copy share link," "Download calendar file"). On `pointer: coarse` devices "Add to my calendar" takes the Rose slot in the calendar card and the download steps down to a ghost button, "Or download the file."
 - **Ghost / Quiet:** `.btn-ghost-light` is transparent with an on-lining-line border, for secondary actions on velvet; `.btn-quiet` is transparent with a paper-line border and ink text, for secondary actions on paper.
 - **Danger:** three strengths, one per job. `.btn-danger` (velvet, outlined in Danger Line, Danger On-Lining text) opens the Start over confirm; `.btn-danger-paper` (paper, outlined, Danger text, Danger Wash on hover) is "Delete this date" in the edit form; `.btn-danger-solid` (Danger fill, white text) is only ever the final "Yes, remove all N". Every destructive button carries the trash icon and a verb; none is icon-only.
-- **Two-step removal:** removing one date is a single labelled click with a 12-second Undo toast. Removing everything first swaps "Remove all dates…" in place for a question that names the count ("Remove all 12 dates?"), a solid confirm and "Keep them" (focused, Escape also cancels). Nothing opens a modal.
+- **Two-step removal:** removing one date is a single labelled click with a 12-second Undo toast. Removing everything first swaps "Remove all dates…" in place for a question that names the count ("Remove all 12 dates?"), a solid confirm and "Keep them" (focused, Escape also cancels). Removal never opens a modal.
 - **Hover / Focus:** background/color/border transition over 160ms (`var(--ease-out)`); `:active` presses down 1px (`translateY(1px)`); focus uses the shared `:focus-visible` outline (2px rose, 2px offset), except inside paper/card contexts where the outline color swaps to Stamp Ink.
 
 ### Chips (if used)

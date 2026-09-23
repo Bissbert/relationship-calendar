@@ -345,11 +345,18 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <div class="takeaway-grid">
     <div class="take">
       <h3 class="take-title">Into your calendar</h3>
-      <p class="take-text">Download an <code>.ics</code> file and open it in Apple Calendar, Google Calendar or Outlook. Dates you add again later replace the old copies instead of doubling up.</p>
-      <button type="button" class="btn btn-rose" id="export-btn">
-        <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-        <span id="export-label">Download calendar file</span>
-      </button>
+      <p class="take-text" id="export-text">Download an <code>.ics</code> file and open it in Apple Calendar, Google Calendar or Outlook. Dates you add again later replace the old copies instead of doubling up.</p>
+      <p class="take-text" id="device-cal-text" hidden>Send your dates straight to the calendar app on this phone. It asks you to confirm before anything is added. Dates you add again later replace the old copies instead of doubling up.</p>
+      <div class="take-actions">
+        <button type="button" class="btn btn-rose" id="device-cal-btn" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-cal-plus"/></svg>
+          <span id="device-cal-label">Add to my calendar</span>
+        </button>
+        <button type="button" class="btn btn-rose" id="export-btn">
+          <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+          <span id="export-label">Download calendar file</span>
+        </button>
+      </div>
     </div>
     <div class="take">
       <h3 class="take-title">To your partner</h3>

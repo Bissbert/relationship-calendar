@@ -6,7 +6,7 @@ import { occurrences, nextOccurrence, addMonthsClamped, relative, ordinal, isVal
 import { normalizeEvent, migrateLegacy, merge } from '../js/model.js';
 import { milestones } from '../js/milestones.js';
 import { toICS, fromICS, fold, escapeText, reminderTrigger, parseDuration } from '../js/ics.js';
-import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup } from '../js/share.js';
+import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup, deviceCalendarRoute } from '../js/share.js';
 import { presets, availablePresets } from '../js/presets.js';
 import { shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from '../js/welcome.js';
 
@@ -250,4 +250,16 @@ test('first-run setup offers the common milestones, upcoming ones ticked', () =>
     ['6 months together', 'milestone', '1d'],
   ]);
   assert.equal(events[0].group, events[1].group);
+});
+
+test('deviceCalendarRoute picks the calendar sheet each phone understands', () => {
+  const iphone = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1';
+  const ipad = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
+  const android = 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36';
+  assert.equal(deviceCalendarRoute({ userAgent: iphone, maxTouchPoints: 5, canShareFiles: true }), 'open');
+  assert.equal(deviceCalendarRoute({ userAgent: ipad, maxTouchPoints: 5 }), 'open');
+  assert.equal(deviceCalendarRoute({ userAgent: ipad, maxTouchPoints: 0 }), 'download');
+  assert.equal(deviceCalendarRoute({ userAgent: android, maxTouchPoints: 5, canShareFiles: true }), 'share');
+  assert.equal(deviceCalendarRoute({ userAgent: android, maxTouchPoints: 5, canShareFiles: false }), 'download');
+  assert.equal(deviceCalendarRoute(), 'download');
 });
