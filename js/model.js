@@ -169,3 +169,14 @@ export function merge(existing, incoming) {
   }
   return { events: [...byId.values()], added, updated };
 }
+
+// "Alex & Sam", one name, or '' when neither is set.
+export function coupleName(settings) {
+  const [a, b] = settings.names;
+  if (a && b) return `${a} & ${b}`;
+  return a || b || '';
+}
+
+export function calendarName(settings) {
+  return coupleName(settings) ? `${coupleName(settings)} · Relationship Calendar` : 'Relationship Calendar';
+}

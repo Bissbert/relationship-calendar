@@ -6,7 +6,9 @@ import { occurrences, nextOccurrence, addMonthsClamped, relative, ordinal, isVal
 import { normalizeEvent, migrateLegacy, merge } from '../js/model.js';
 import { milestones } from '../js/milestones.js';
 import { toICS, fromICS, fold, escapeText, reminderTrigger, parseDuration } from '../js/ics.js';
-import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup, deviceCalendarRoute } from '../js/share.js';
+import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup, deviceCalendarRoute, calendarFileUrl, readCalendarFileUrl } from '../js/share.js';
+import { calendarName } from '../js/model.js';
+import { onRequestGet as calendarFunction } from '../functions/calendar.ics.js';
 import { presets, availablePresets } from '../js/presets.js';
 import { shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from '../js/welcome.js';
 
@@ -173,6 +175,36 @@ test('share link round-trips through the URL fragment', async () => {
   assert.deepEqual(back.settings, settings);
   assert.deepEqual(back.events.map((e) => [e.id, e.date, e.time, e.notes]), list.map((e) => [e.id, e.date, e.time, e.notes]));
   assert.equal(await readShareLink('#share=zgarbage'), null);
+});
+
+test('calendar file URL carries the dates to /calendar.ics and back', async () => {
+  const list = [ev({ id: 'cal-1', title: 'Our anniversary', repeat: 'yearly' }), ev({ id: 'cal-2', date: '2026-02-01', time: '08:15' })];
+  const settings = { names: ['Alex', 'Sam'], since: '' };
+  const url = await calendarFileUrl(list, settings, 'https://calendar.example/some/page#x');
+  assert.ok(url.startsWith('https://calendar.example/calendar.ics?d='));
+  const back = await readCalendarFileUrl(url);
+  assert.deepEqual(back.events.map((e) => [e.id, e.title, e.date, e.time, e.repeat]), list.map((e) => [e.id, e.title, e.date, e.time, e.repeat]));
+  assert.equal(calendarName(back.settings), 'Alex & Sam · Relationship Calendar');
+  assert.equal(calendarName({ names: ['', ''] }), 'Relationship Calendar');
+  const many = Array.from({ length: 3000 }, (_, i) => ev({ id: `many-${i}`, title: `Date ${i} ${Math.random()}`, notes: String(Math.random()) }));
+  assert.equal(await calendarFileUrl(many, settings, 'https://calendar.example/'), '');
+});
+
+test('/calendar.ics rebuilds the file and rejects broken links', async () => {
+  const url = await calendarFileUrl([ev({ id: 'fn-1', title: 'Date night' })], { names: ['Alex', 'Sam'], since: '' }, 'https://calendar.example/');
+  const ok = await calendarFunction({ request: new Request(url) });
+  assert.equal(ok.status, 200);
+  assert.equal(ok.headers.get('Content-Type'), 'text/calendar; charset=utf-8');
+  assert.equal(ok.headers.get('Cache-Control'), 'no-store');
+  const body = await ok.text();
+  assert.match(body, /^BEGIN:VCALENDAR\r\n/);
+  assert.match(body, /SUMMARY:Date night/);
+  assert.match(body, /X-WR-CALNAME:Alex & Sam · Relationship Calendar/);
+  for (const bad of ['https://calendar.example/calendar.ics', 'https://calendar.example/calendar.ics?d=zgarbage', 'https://calendar.example/calendar.ics?d=<script>']) {
+    const res = await calendarFunction({ request: new Request(bad) });
+    assert.equal(res.status, 400);
+    assert.equal(res.headers.get('Content-Type'), 'text/plain; charset=utf-8');
+  }
 });
 
 test('backup round-trips', () => {
