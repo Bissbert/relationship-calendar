@@ -1,0 +1,64 @@
+
+=== environment (python)
+Linux 6.5.11-linuxkit aarch64
+Python 3.12.14
+
+=== python3 tools/measure.py
+Runtime files: 15
+index.html: 427 lines, 23391 bytes
+favicon.svg: 1 lines, 221 bytes
+_headers: 10 lines, 559 bytes
+css/app.css: 1037 lines, 32773 bytes
+js/dates.js: 154 lines, 5363 bytes
+js/ics.js: 284 lines, 10588 bytes
+js/main.js: 1212 lines, 47616 bytes
+js/milestones.js: 36 lines, 1550 bytes
+js/model.js: 171 lines, 5585 bytes
+js/presets.js: 90 lines, 2749 bytes
+js/share.js: 158 lines, 6262 bytes
+js/welcome.js: 65 lines, 2735 bytes
+Code total: 3645 lines, 139392 bytes
+fonts/barlow-condensed-600.woff2: 14844 bytes
+fonts/figtree.woff2: 20184 bytes
+fonts/young-serif.woff2: 18520 bytes
+Font total: 53548 bytes
+Runtime total: 192940 bytes
+PNG media files: 2
+media/relationship-calendar-example.png: 740x700 pixels, 309395 bytes
+media/relationship-calendar-month.png: 740x700 pixels, 255518 bytes
+
+=== environment (node)
+v22.23.3
+
+=== node --test tests/*.test.mjs
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 98.379125
+
+=== environment (browser)
+v22.18.0
+
+=== node tools/browser-check.mjs
+browser                            Chromium 140.0.7339.16
+composer open on empty calendar    true
+"Until" field shown for weekly     true
+stored events after add            1
+stored repeat / until              weekly / 2026-10-29
+title rendered as text             true
+toast after add                    Added “Walk with <b>Kai</b>” on 1 Oct 2026.
+Undo button shown                  true
+stored events after delete         0
+toast after delete                 Deleted “Walk with <b>Kai</b>”.
+stored events after undo           1
+toast after undo                   Undone.
+#clear-btn inside #start-over      true
+confirmation shown                 true
+confirmation text                  Remove your one date? You can undo it from the message that appears afterwards.
+stored events after "Keep them"    1
+page wider than 390 px viewport    false
+console / page errors              none

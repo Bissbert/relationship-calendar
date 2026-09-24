@@ -53,7 +53,7 @@ doesn't run `functions/`; to try `/calendar.ics`, build and run
 Run the tests with Node 22 or newer (the share-link tests need `CompressionStream("deflate-raw")`):
 
 ```sh
-node --test tests/
+node --test tests/*.test.mjs
 ```
 
 ## Deploy
@@ -104,7 +104,7 @@ js/             ES modules (see the architecture diagram)
 fonts/          self-hosted Young Serif, Figtree, Barlow Condensed + OFL licenses
 _headers        Cloudflare Pages security headers
 tests/          node:test suite for dates, model, milestones, .ics and sharing
-tools/          dist build script and measurement script
+tools/          dist build, measurement and Linux check scripts
 media/          screenshots from a real local run
 docs/           subsystem write-ups
 PRODUCT.md      product context used for design work
