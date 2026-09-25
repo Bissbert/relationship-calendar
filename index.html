@@ -72,6 +72,62 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </form>
 </dialog>
 
+<dialog id="cal-help" class="card share-dialog cal-help" aria-labelledby="cal-help-title">
+  <form method="dialog" class="share-dialog-body">
+    <p class="share-kicker">
+      <svg class="icon" aria-hidden="true"><use href="#i-cal-plus"/></svg>
+      Into your calendar
+    </p>
+    <h2 id="cal-help-title" class="share-title">Add your dates to your calendar</h2>
+    <div id="cal-help-here"></div>
+    <details class="more cal-help-other">
+      <summary>Using a different device?</summary>
+      <section class="cal-help-steps" data-platform="ios-safari">
+        <h3>iPhone or iPad, in Safari</h3>
+        <ol>
+          <li>Tap <b>Download calendar file</b> below, then <b>Download</b> if Safari asks.</li>
+          <li>Tap the downloads arrow in the address bar and tap <b>relationship-calendar.ics</b>.</li>
+          <li>Tap <b>Add All</b> and choose the calendar to add them to.</li>
+        </ol>
+      </section>
+      <section class="cal-help-steps" data-platform="ios-other">
+        <h3>iPhone or iPad, in another browser or app</h3>
+        <ol>
+          <li>Tap <b>Download calendar file</b> below. If a share sheet opens, pick <b>Save to Files</b>.</li>
+          <li>Open the <b>Files</b> app, go to <b>Downloads</b> and tap <b>relationship-calendar.ics</b>.</li>
+          <li>Tap <b>Add All</b> and choose the calendar to add them to.</li>
+        </ol>
+        <p class="cal-help-note">Chrome and apps like Instagram can't open calendar files themselves. Opening this page in Safari works too.</p>
+      </section>
+      <section class="cal-help-steps" data-platform="android">
+        <h3>Android phone</h3>
+        <ol>
+          <li>Tap <b>Download calendar file</b> below.</li>
+          <li>Open the file from the download notification or the <b>Files</b> app.</li>
+          <li>Pick your calendar app, for example Samsung Calendar, and save the dates.</li>
+        </ol>
+        <p class="cal-help-note">The Google Calendar app can't open calendar files. Use the Google Calendar button on each date instead, or import the file on a computer at calendar.google.com under Settings → Import &amp; export.</p>
+      </section>
+      <section class="cal-help-steps" data-platform="desktop">
+        <h3>Computer</h3>
+        <ol>
+          <li>Click <b>Download calendar file</b> below.</li>
+          <li><b>Apple Calendar</b> or <b>Outlook</b>: open the downloaded file.</li>
+          <li><b>Google Calendar</b>: go to calendar.google.com, then Settings → Import &amp; export, and import the file.</li>
+        </ol>
+      </section>
+    </details>
+    <p class="share-text cal-help-note">Adding the file again later replaces the old copies instead of doubling up.</p>
+    <div class="share-actions">
+      <button type="button" class="btn btn-primary" id="cal-help-download">
+        <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+        <span id="cal-help-download-label">Download calendar file</span>
+      </button>
+      <button type="submit" value="" class="btn btn-quiet">Close</button>
+    </div>
+  </form>
+</dialog>
+
 <header class="top">
   <div class="wrap top-grid">
     <div class="couple">
@@ -350,16 +406,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <div class="takeaway-grid">
     <div class="take">
       <h3 class="take-title">Into your calendar</h3>
-      <p class="take-text" id="export-text">Download an <code>.ics</code> file and open it in Apple Calendar, Google Calendar or Outlook. Dates you add again later replace the old copies instead of doubling up.</p>
-      <p class="take-text" id="device-cal-text" hidden>Send your dates straight to the calendar app on this phone. It asks you to confirm before anything is added. Dates you add again later replace the old copies instead of doubling up.</p>
+      <p class="take-text">Download an <code>.ics</code> file and open it in Apple Calendar, Google Calendar, Outlook or the calendar on your phone. Dates you add again later replace the old copies instead of doubling up.</p>
       <div class="take-actions">
-        <button type="button" class="btn btn-rose" id="device-cal-btn" hidden>
-          <svg class="icon" aria-hidden="true"><use href="#i-cal-plus"/></svg>
-          <span id="device-cal-label">Add to my calendar</span>
-        </button>
         <button type="button" class="btn btn-rose" id="export-btn">
           <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
           <span id="export-label">Download calendar file</span>
+        </button>
+        <button type="button" class="btn btn-ghost-light" id="cal-help-btn">
+          <svg class="icon" aria-hidden="true"><use href="#i-cal-plus"/></svg>
+          <span>How do I add it?</span>
         </button>
       </div>
     </div>

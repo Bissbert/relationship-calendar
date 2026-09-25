@@ -6,9 +6,8 @@ import { occurrences, nextOccurrence, addMonthsClamped, relative, ordinal, isVal
 import { normalizeEvent, migrateLegacy, merge } from '../js/model.js';
 import { milestones } from '../js/milestones.js';
 import { toICS, fromICS, fold, escapeText, reminderTrigger, parseDuration } from '../js/ics.js';
-import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup, deviceCalendarRoute, calendarFileUrl, readCalendarFileUrl } from '../js/share.js';
+import { shareLink, readShareLink, googleCalendarLink, toBackup, fromBackup, calendarHelpPlatform } from '../js/share.js';
 import { calendarName } from '../js/model.js';
-import { onRequestGet as calendarFunction } from '../functions/calendar.ics.js';
 import { presets, availablePresets } from '../js/presets.js';
 import { shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from '../js/welcome.js';
 
@@ -177,36 +176,6 @@ test('share link round-trips through the URL fragment', async () => {
   assert.equal(await readShareLink('#share=zgarbage'), null);
 });
 
-test('calendar file URL carries the dates to /calendar.ics and back', async () => {
-  const list = [ev({ id: 'cal-1', title: 'Our anniversary', repeat: 'yearly' }), ev({ id: 'cal-2', date: '2026-02-01', time: '08:15' })];
-  const settings = { names: ['Alex', 'Sam'], since: '' };
-  const url = await calendarFileUrl(list, settings, 'https://calendar.example/some/page#x');
-  assert.ok(url.startsWith('https://calendar.example/calendar.ics?d='));
-  const back = await readCalendarFileUrl(url);
-  assert.deepEqual(back.events.map((e) => [e.id, e.title, e.date, e.time, e.repeat]), list.map((e) => [e.id, e.title, e.date, e.time, e.repeat]));
-  assert.equal(calendarName(back.settings), 'Alex & Sam · Relationship Calendar');
-  assert.equal(calendarName({ names: ['', ''] }), 'Relationship Calendar');
-  const many = Array.from({ length: 3000 }, (_, i) => ev({ id: `many-${i}`, title: `Date ${i} ${Math.random()}`, notes: String(Math.random()) }));
-  assert.equal(await calendarFileUrl(many, settings, 'https://calendar.example/'), '');
-});
-
-test('/calendar.ics rebuilds the file and rejects broken links', async () => {
-  const url = await calendarFileUrl([ev({ id: 'fn-1', title: 'Date night' })], { names: ['Alex', 'Sam'], since: '' }, 'https://calendar.example/');
-  const ok = await calendarFunction({ request: new Request(url) });
-  assert.equal(ok.status, 200);
-  assert.equal(ok.headers.get('Content-Type'), 'text/calendar; charset=utf-8');
-  assert.equal(ok.headers.get('Cache-Control'), 'no-store');
-  const body = await ok.text();
-  assert.match(body, /^BEGIN:VCALENDAR\r\n/);
-  assert.match(body, /SUMMARY:Date night/);
-  assert.match(body, /X-WR-CALNAME:Alex & Sam · Relationship Calendar/);
-  for (const bad of ['https://calendar.example/calendar.ics', 'https://calendar.example/calendar.ics?d=zgarbage', 'https://calendar.example/calendar.ics?d=<script>']) {
-    const res = await calendarFunction({ request: new Request(bad) });
-    assert.equal(res.status, 400);
-    assert.equal(res.headers.get('Content-Type'), 'text/plain; charset=utf-8');
-  }
-});
-
 test('backup round-trips', () => {
   const list = [ev({ id: 'backup-1' })];
   const back = fromBackup(toBackup(list, { names: ['A', 'B'], since: '' }));
@@ -284,14 +253,21 @@ test('first-run setup offers the common milestones, upcoming ones ticked', () =>
   assert.equal(events[0].group, events[1].group);
 });
 
-test('deviceCalendarRoute picks the calendar sheet each phone understands', () => {
-  const iphone = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1';
-  const ipad = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
-  const android = 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36';
-  assert.equal(deviceCalendarRoute({ userAgent: iphone, maxTouchPoints: 5, canShareFiles: true }), 'open');
-  assert.equal(deviceCalendarRoute({ userAgent: ipad, maxTouchPoints: 5 }), 'open');
-  assert.equal(deviceCalendarRoute({ userAgent: ipad, maxTouchPoints: 0 }), 'download');
-  assert.equal(deviceCalendarRoute({ userAgent: android, maxTouchPoints: 5, canShareFiles: true }), 'share');
-  assert.equal(deviceCalendarRoute({ userAgent: android, maxTouchPoints: 5, canShareFiles: false }), 'download');
-  assert.equal(deviceCalendarRoute(), 'download');
+test('calendarHelpPlatform opens the help on the steps for this device', () => {
+  const safari = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const chromeIos = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1';
+  const firefoxIos = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/132.0 Mobile/15E148 Safari/605.1.15';
+  const inApp = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 350.0.0';
+  const ipad = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15';
+  const android = 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+  const windows = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
+  assert.equal(calendarHelpPlatform({ userAgent: safari, maxTouchPoints: 5 }), 'ios-safari');
+  assert.equal(calendarHelpPlatform({ userAgent: ipad, maxTouchPoints: 5 }), 'ios-safari');
+  assert.equal(calendarHelpPlatform({ userAgent: ipad, maxTouchPoints: 0 }), 'desktop');
+  assert.equal(calendarHelpPlatform({ userAgent: chromeIos, maxTouchPoints: 5 }), 'ios-other');
+  assert.equal(calendarHelpPlatform({ userAgent: firefoxIos, maxTouchPoints: 5 }), 'ios-other');
+  assert.equal(calendarHelpPlatform({ userAgent: inApp, maxTouchPoints: 5 }), 'ios-other');
+  assert.equal(calendarHelpPlatform({ userAgent: android, maxTouchPoints: 5 }), 'android');
+  assert.equal(calendarHelpPlatform({ userAgent: windows }), 'desktop');
+  assert.equal(calendarHelpPlatform(), 'desktop');
 });

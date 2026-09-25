@@ -31,24 +31,24 @@ copies) and reads PNG dimensions from their headers.
 
 ```text
 Runtime files: 15
-index.html: 427 lines, 23391 bytes
+index.html: 482 lines, 26216 bytes
 favicon.svg: 1 lines, 221 bytes
 _headers: 10 lines, 559 bytes
-css/app.css: 1037 lines, 32773 bytes
+css/app.css: 1047 lines, 33550 bytes
 js/dates.js: 154 lines, 5363 bytes
 js/ics.js: 284 lines, 10588 bytes
-js/main.js: 1212 lines, 47616 bytes
+js/main.js: 1206 lines, 47484 bytes
 js/milestones.js: 36 lines, 1550 bytes
-js/model.js: 171 lines, 5585 bytes
+js/model.js: 182 lines, 5927 bytes
 js/presets.js: 90 lines, 2749 bytes
-js/share.js: 158 lines, 6262 bytes
+js/share.js: 143 lines, 5798 bytes
 js/welcome.js: 65 lines, 2735 bytes
-Code total: 3645 lines, 139392 bytes
+Code total: 3700 lines, 142740 bytes
 fonts/barlow-condensed-600.woff2: 14844 bytes
 fonts/figtree.woff2: 20184 bytes
 fonts/young-serif.woff2: 18520 bytes
 Font total: 53548 bytes
-Runtime total: 192940 bytes
+Runtime total: 196288 bytes
 PNG media files: 2
 media/relationship-calendar-example.png: 740x700 pixels, 309395 bytes
 media/relationship-calendar-month.png: 740x700 pixels, 255518 bytes
@@ -77,8 +77,8 @@ The suite covers date validation, monthly and yearly repeats across short
 months and leap years, legacy migration, merging, milestones, quick picks, the
 first-run welcome, `.ics` export (escaping, folding, alarms, timed and all-day
 events), an `.ics` round trip of every field, import of a foreign calendar,
-share-link and backup round trips, Google Calendar links and the "Add to my
-calendar" routing per device.
+share-link and backup round trips, Google Calendar links and which steps the
+calendar help opens on for each device.
 
 ## Browser check
 
@@ -86,7 +86,10 @@ calendar" routing per device.
 from a small Node server and drives it in headless Chromium at 390 × 844 px,
 with the clock fixed at 2026-09-24 10:00 and the first-run welcome skipped. It
 adds a weekly date with an end date and markup in the title, deletes it from
-its ticket, undoes the delete, and opens and cancels **Start over**:
+its ticket, undoes the delete, and opens and cancels **Start over**. It then
+opens the calendar help, downloads from inside it and closes it with Escape,
+and opens it again under iPhone Safari, iPhone Chrome and Android user agents
+to see which steps it leads with:
 
 ```text
 browser                            Chromium 140.0.7339.16
@@ -105,14 +108,24 @@ toast after undo                   Undone.
 confirmation shown                 true
 confirmation text                  Remove your one date? You can undo it from the message that appears afterwards.
 stored events after "Keep them"    1
+help dialog open                   true
+help leads with (desktop UA)       desktop
+other devices in disclosure        3
+download from dialog               relationship-calendar.ics
+dialog still open after download   true
+dialog closed by Escape            true
+help leads with (iPhone Safari)    ios-safari
+help leads with (iPhone Chrome)    ios-other
+help leads with (Android Chrome)   android
 page wider than 390 px viewport    false
 console / page errors              none
 ```
 
 ## Not covered
 
-- Safari, Firefox and real phones. The iOS and Android "Add to my calendar"
-  paths are covered only by the routing tests.
+- Safari, Firefox and real phones. The calendar help steps for iOS and
+  Android were written from the platforms' documentation, not tried on a
+  device; the platform detection is covered by unit tests.
 - Importing the exported `.ics` file into Apple Calendar, Google Calendar and
   Outlook. The test suite checks the file itself.
 - Load time.

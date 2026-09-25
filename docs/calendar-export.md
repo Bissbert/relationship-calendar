@@ -36,6 +36,23 @@ Each ticket has a link to `calendar.google.com/calendar/render` with the
 title, dates, place, notes and repeat rule prefilled. It opens in a new tab;
 nothing is sent until the user saves it in Google Calendar.
 
+## Calendar help
+
+No browser API writes to a phone's calendar, so every device gets the same
+`.ics` download. "How do I add it?" opens a dialog that explains what to do
+with the file next. `calendarHelpPlatform` in `js/share.js` reads the user
+agent and picks the steps it leads with:
+
+| Platform | Detected by | Steps |
+|---|---|---|
+| `ios-safari` | iPhone, iPad or iPod (or a Mac UA with touch points, which is iPadOS) with `Safari/` and no other browser token | Downloads arrow in the address bar → tap the file → Add All |
+| `ios-other` | iOS with `CriOS`, `FxiOS`, `EdgiOS`, `OPiOS` or `GSA`, or no `Safari/` at all (in-app browsers) | Save to Files → Files app → Downloads → tap the file → Add All |
+| `android` | `Android` | Open the download → pick a calendar app that imports `.ics` (e.g. Samsung Calendar); Google Calendar on a phone can't, so the note points to the per-date Google links or the import on calendar.google.com |
+| `desktop` | anything else | Open the file in Apple Calendar or Outlook, or import it on calendar.google.com |
+
+The other platforms' steps sit in a "Using a different device?" disclosure in
+the same dialog, so a wrong guess costs one tap.
+
 ## Share links
 
 ```mermaid

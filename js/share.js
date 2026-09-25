@@ -79,24 +79,6 @@ export async function readShareLink(hash = location.hash) {
   return String(hash).startsWith(prefix) ? decodePayload(String(hash).slice(prefix.length)) : null;
 }
 
-// iOS only offers its "Add All" calendar sheet for a .ics file that arrives
-// over https, so the calendar button sends the dates to the site's own
-// /calendar.ics function, which turns them straight back into a file and
-// keeps nothing. The dates travel in the query string, so this is the one
-// place they reach the server. Returns '' when the URL would be too long.
-export const CALENDAR_PATH = '/calendar.ics';
-const MAX_CALENDAR_URL = 15000;
-
-export async function calendarFileUrl(events, settings, base = location.href) {
-  const url = new URL(CALENDAR_PATH, base);
-  url.search = new URLSearchParams({ d: await encodePayload(events, settings) });
-  return url.href.length <= MAX_CALENDAR_URL ? url.href : '';
-}
-
-export async function readCalendarFileUrl(url) {
-  return decodePayload(new URL(url).searchParams.get('d'));
-}
-
 export function toBackup(events, settings) {
   return JSON.stringify({ app: 'relationship-calendar', version: 2, exported: new Date().toISOString(), settings, events }, null, 2);
 }
@@ -145,45 +127,17 @@ export function download(filename, text, type) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// How a phone hands a calendar file to its own calendar app. No web API can
-// write to the device calendar, so each route ends in a sheet the person
-// confirms:
-// - 'open': iOS shows its "Add All" calendar sheet when the browser opens a
-//   text/calendar file from an https URL. It refuses data: and blob: URLs,
-//   and a download would only land in Files.
-// - 'share': the share sheet, where the person picks their calendar app.
-// - 'download': the file lands in Downloads; tapping it opens the calendar.
+// Which steps the calendar help dialog opens on. No web API can write to the
+// device calendar, so the person always downloads the file and opens it:
+// - 'ios-safari': Safari keeps downloads behind the arrow in the address bar,
+//   and opening the file there shows the "Add All" calendar sheet.
+// - 'ios-other': Chrome, Firefox, Edge and in-app browsers on iOS can't hand
+//   the file to Calendar, so it goes through the Files app instead.
+// - 'android': the file opens in a calendar app that imports .ics files.
+// - 'desktop': everything else.
 // iPadOS reports itself as a Mac, so touch points tell the two apart.
-export function deviceCalendarRoute({ userAgent = '', maxTouchPoints = 0, canShareFiles = false } = {}) {
+export function calendarHelpPlatform({ userAgent = '', maxTouchPoints = 0 } = {}) {
   const ios = /iPhone|iPad|iPod/.test(userAgent) || (/Macintosh/.test(userAgent) && maxTouchPoints > 1);
-  if (ios) return 'open';
-  return canShareFiles ? 'share' : 'download';
-}
-
-// Returns the route taken, or '' when the person closed the share sheet.
-export async function addToDeviceCalendar({ filename, text, events, settings }) {
-  const file = new File([text], filename, { type: 'text/calendar' });
-  let canShareFiles = false;
-  try { canShareFiles = Boolean(navigator.canShare?.({ files: [file] })); } catch { /* unsupported */ }
-  const route = deviceCalendarRoute({ userAgent: navigator.userAgent, maxTouchPoints: navigator.maxTouchPoints, canShareFiles });
-
-  if (route === 'open') {
-    const url = await calendarFileUrl(events, settings);
-    if (url) {
-      location.href = url;
-      return route;
-    }
-    // Too many dates for one URL: the download still gets them into Files.
-  }
-  if (route === 'share') {
-    try {
-      await navigator.share({ files: [file], title: filename });
-      return route;
-    } catch (error) {
-      if (error?.name === 'AbortError') return '';
-      // Anything else (no permission, a flaky share target): fall through.
-    }
-  }
-  download(filename, text, 'text/calendar');
-  return 'download';
+  if (ios) return /Safari\//.test(userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA\//.test(userAgent) ? 'ios-safari' : 'ios-other';
+  return /Android/.test(userAgent) ? 'android' : 'desktop';
 }

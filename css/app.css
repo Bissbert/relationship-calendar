@@ -228,6 +228,16 @@ code {
   @keyframes share-in { from { opacity: 0; transform: translateY(0.75rem); } }
 }
 
+/* Calendar help: the steps for this device first, the others folded away. */
+.cal-help-steps { display: grid; gap: 0.5rem; }
+.cal-help-steps h3 { margin: 0; font-size: 1rem; }
+#cal-help-here .cal-help-steps h3 { color: var(--ink-soft); font: 600 0.8125rem var(--font-stamp); letter-spacing: 0.06em; text-transform: uppercase; }
+.cal-help-steps ol { display: grid; gap: 0.45rem; margin: 0; padding-left: 1.4rem; }
+.cal-help-steps li::marker { color: var(--stamp); font-weight: 600; }
+.cal-help-note { margin: 0; color: var(--ink-soft); font-size: 0.875rem; }
+.cal-help-other { padding-top: 0.25rem; border-top: 1px dashed var(--paper-line); }
+.cal-help-other .cal-help-steps + .cal-help-steps { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--paper-line); }
+
 /* ------------------------------------------------------------ header */
 
 .top { padding-block: clamp(1.25rem, 3vw, 2rem) clamp(2rem, 5vw, 3.5rem); }

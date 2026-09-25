@@ -44,9 +44,7 @@ days, numbered anniversaries) that general calendar apps do not.
 - Upcoming list with countdowns, month view, edit, delete with undo.
 - Export `.ics` (RFC 5545, all-day by default, RRULE, VALARM, stable UIDs),
   import `.ics` and JSON backups, share link in the URL fragment.
-- All data lives in `localStorage`. The only time dates reach the server is
-  "Add to my calendar" on iOS: `/calendar.ics` turns them back into a file on
-  the spot and stores nothing.
+- All data lives in `localStorage`; dates never reach the server.
 - English only.
 
 ## Brand Commitments
