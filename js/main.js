@@ -10,12 +10,11 @@ import { MILESTONE_SETS, milestones } from './milestones.js';
 import { availablePresets } from './presets.js';
 import { WELCOMED_KEY, shouldWelcome, welcomeChoices, welcomeMilestones, welcomeEvents } from './welcome.js';
 import { toICS, fromICS } from './ics.js';
-import { shareLink, readShareLink, toBackup, fromBackup, googleCalendarLink, download, addToDeviceCalendar } from './share.js';
+import { shareLink, readShareLink, toBackup, fromBackup, googleCalendarLink, download, calendarHelpPlatform } from './share.js';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
 // Phones get a one-tap button that hands the dates to their calendar app.
-const onPhone = matchMedia('(pointer: coarse)').matches;
 
 const state = load();
 const ui = {
@@ -516,10 +515,10 @@ function render() {
 
 function renderTakeaway() {
   const n = state.events.length;
-  $('export-label').textContent = onPhone ? 'Or download the file'
-    : n ? `Download calendar file · ${plural(n, 'date')}` : 'Download calendar file';
-  $('device-cal-label').textContent = n ? `Add to my calendar · ${plural(n, 'date')}` : 'Add to my calendar';
-  for (const id of ['device-cal-btn', 'export-btn', 'share-btn', 'backup-btn', 'clear-btn']) $(id).disabled = !n;
+  const label = n ? `Download calendar file · ${plural(n, 'date')}` : 'Download calendar file';
+  $('export-label').textContent = label;
+  $('cal-help-download-label').textContent = label;
+  for (const id of ['export-btn', 'cal-help-download', 'share-btn', 'backup-btn', 'clear-btn']) $(id).disabled = !n;
   if (!n && !$('clear-confirm').hidden) askClear(false);
 }
 
@@ -882,25 +881,25 @@ function calendarFile() {
   return toICS(state.events, { name: calendarName(state.settings) });
 }
 
-$('export-btn').addEventListener('click', () => {
+function downloadCalendar() {
   if (!state.events.length) return;
   download('relationship-calendar.ics', calendarFile(), 'text/calendar');
   toast(`Downloaded ${plural(state.events.length, 'date')}. Open the file to add them to your calendar.`);
-});
-
-// On phones the calendar app is one tap away, so that button leads and the
-// plain download steps back to a secondary button.
-if (onPhone) {
-  $('device-cal-btn').hidden = false;
-  $('device-cal-text').hidden = false;
-  $('export-text').hidden = true;
-  $('export-btn').classList.replace('btn-rose', 'btn-ghost-light');
 }
 
-$('device-cal-btn').addEventListener('click', async () => {
-  if (!state.events.length) return;
-  const route = await addToDeviceCalendar({ filename: 'relationship-calendar.ics', text: calendarFile(), events: state.events, settings: state.settings });
-  if (route === 'download') toast(`Downloaded ${plural(state.events.length, 'date')}. Tap the file in your downloads to open it in your calendar.`);
+$('export-btn').addEventListener('click', downloadCalendar);
+$('cal-help-download').addEventListener('click', downloadCalendar);
+
+// No browser can write to the phone's calendar, so the help dialog leads with
+// the steps for the device in hand and keeps the others one tap away.
+const helpPlatform = calendarHelpPlatform({ userAgent: navigator.userAgent, maxTouchPoints: navigator.maxTouchPoints });
+$('cal-help-here').append(document.querySelector(`.cal-help-steps[data-platform="${helpPlatform}"]`));
+
+$('cal-help-btn').addEventListener('click', () => {
+  const dialog = $('cal-help');
+  dialog.querySelector('.cal-help-other').open = false;
+  dialog.showModal();
+  (state.events.length ? $('cal-help-download') : dialog.querySelector('button[type="submit"]')).focus();
 });
 
 async function copyText(text) {

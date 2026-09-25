@@ -73,6 +73,31 @@ say('confirmation text', await page.textContent('#clear-question'));
 await page.click('#clear-no');
 say('stored events after "Keep them"', (await stored()).length);
 
+// Calendar help: the dialog leads with the steps for the device in hand.
+await page.click('#cal-help-btn');
+say('help dialog open', await page.evaluate(() => document.getElementById('cal-help').open));
+say('help leads with (desktop UA)', await page.getAttribute('#cal-help-here .cal-help-steps', 'data-platform'));
+say('other devices in disclosure', await page.locator('.cal-help-other .cal-help-steps').count());
+const [file] = await Promise.all([page.waitForEvent('download'), page.click('#cal-help-download')]);
+say('download from dialog', file.suggestedFilename());
+say('dialog still open after download', await page.evaluate(() => document.getElementById('cal-help').open));
+await page.keyboard.press('Escape');
+say('dialog closed by Escape', await page.evaluate(() => !document.getElementById('cal-help').open));
+for (const [name, userAgent] of [
+  ['iPhone Safari', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'],
+  ['iPhone Chrome', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1'],
+  ['Android Chrome', 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36'],
+]) {
+  const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, userAgent, hasTouch: true });
+  await phone.addInitScript(() => localStorage.setItem('relationship-calendar:welcomed', '1'));
+  await phone.goto(base);
+  await phone.click('#cal-help-btn');
+  const lead = await phone.getAttribute('#cal-help-here .cal-help-steps', 'data-platform');
+  const wide = await phone.evaluate(() => document.getElementById('cal-help').scrollWidth > document.getElementById('cal-help').clientWidth);
+  say(`help leads with (${name})`, `${lead}${wide ? ', overflows' : ''}`);
+  await phone.close();
+}
+
 say('page wider than 390 px viewport', await page.evaluate(() => document.documentElement.scrollWidth > innerWidth));
 say('console / page errors', errors.length ? errors.join(' | ') : 'none');
 
